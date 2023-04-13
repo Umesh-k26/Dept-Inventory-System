@@ -30,11 +30,11 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-async def get_test(email: Annotated[str, Depends(get_email)]):
-    print(f"email is {email}")
-    print(Config.GOOGLE_CLIENT_ID)
-    return {"email": email}
+@app.get("/get-role/")
+async def get_test(email: Annotated[str ,Depends(get_email)]):
+    # print(f"email is {email}")
+    # print(Config.GOOGLE_CLIENT_ID)
+    return {"role": "admin"}
 
 # USER details
 
