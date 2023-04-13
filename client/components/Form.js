@@ -1,26 +1,171 @@
 import { useRef } from "react";
 import { useSession } from "next-auth/react";
 
-const FormField = ({ type, id, required, label, inputRef }) => {
-  return (
-    <div className="mb-4">
-      <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
-        {label}
-        {required && <span className="text-red-500">*</span>}
-      </label>
-      <input
-        type={type}
-        id={id}
-        name={id}
-        required={required}
-        ref={inputRef}
-        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-      />
-    </div>
-  );
+// const FormField = ({ type, id, required, label, inputRef }) => {
+//   return (
+//     <div className="mb-4">
+//       <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
+//         {label}
+//         {required && <span className="text-red-500">*</span>}
+//       </label>
+//       <input
+//         type={type}
+//         id={id}
+//         name={id}
+//         required={required}
+//         ref={inputRef}
+//         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+//       />
+//     </div>
+//   );
+// };
+const FormField = ({ field, inputRefs }) => {
+  const { id, type, required, label, options } = field;
+
+  switch (type) {
+    case "text":
+    case "email":
+    case "url":
+    case "password":
+    case "number":
+    case "tel":
+    case "date":
+    case "time":
+    case "datetime-local":
+      return (
+        <div>
+          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+          </label>
+          <input
+            type={type}
+            id={id}
+            name={id}
+            ref={inputRefs[id]}
+            required={required}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+      );
+    case "textarea":
+      return (
+        <div>
+          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+          </label>
+          <textarea
+            id={id}
+            name={id}
+            ref={inputRefs[id]}
+            required={required}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          ></textarea>
+        </div>
+      );
+    case "select":
+      return (
+        <div>
+          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+          </label>
+          <select
+            id={id}
+            name={id}
+            ref={inputRefs[id]}
+            required={required}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          >
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
+    case "checkbox":
+      return (
+        <div>
+          <input
+            type="checkbox"
+            id={id}
+            name={id}
+            ref={inputRefs[id]}
+            required={required}
+            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2"
+          />
+          <label htmlFor={id} className="text-gray-700 font-bold">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+          </label>
+        </div>
+      );
+    case "radio":
+      return (
+        <div>
+          <label className="block text-gray-700 font-bold mb-2">{label}</label>
+          {options.map((option) => (
+            <div key={option.value} className="flex items-center">
+              <input
+                type="radio"
+                id={option.id}
+                name={id}
+                ref={inputRefs[option.id]}
+                value={option.value}
+                required={required}
+                className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2"
+              />
+              <label htmlFor={option.id} className="text-gray-700 font">
+                {}
+              </label>
+            </div>
+          ))}
+        </div>
+      );
+    case "file":
+      return (
+        <div>
+          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+          </label>
+          <input
+            type={type}
+            id={id}
+            name={id}
+            ref={inputRefs[id]}
+            required={required}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+      );
+    case "image":
+      return (
+        <div>
+          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            id={id}
+            name={id}
+            ref={inputRefs[id]}
+            required={required}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+      );
+    default:
+      return null;
+  }
 };
 
-const Form = ({ fields, apiLink, method }) => {
+const Form = ({ fields, apiLink, method, submitName }) => {
   const { data: session, status } = useSession();
   const formRef = useRef(null);
   const inputRefs = fields.reduce((acc, field) => {
@@ -32,8 +177,18 @@ const Form = ({ fields, apiLink, method }) => {
     e.preventDefault();
     const formData = {};
     fields.forEach((field) => {
-      formData[field.id] = inputRefs[field.id].current.value;
+      if (field.type == "file") {
+        const file = inputRefs[field.id].current.files[0];
+        const fileData = new FormData();
+        fileData.append("image", file);
+        formData[field.id] = fileData;
+      } else {
+        formData[field.id] = inputRefs[field.id].current.value;
+        if (inputRefs[field.id].current.value === "") formData[field.id] = null;
+      }
+      console.log(inputRefs[field.id].current);
     });
+    // return;
     try {
       let apiLinkWithParams = apiLink;
       // Replace placeholders in apiLink with corresponding form data
@@ -61,20 +216,13 @@ const Form = ({ fields, apiLink, method }) => {
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
       {fields.map((field) => (
-        <FormField
-          key={field.id}
-          type={field.type}
-          id={field.id}
-          required={field.required}
-          label={field.label}
-          inputRef={inputRefs[field.id]}
-        />
+        <FormField field={field} inputRefs={inputRefs} />
       ))}
       <button
         type="submit"
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
       >
-        Submit
+        {submitName}
       </button>
     </form>
   );

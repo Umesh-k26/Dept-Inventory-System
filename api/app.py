@@ -65,7 +65,7 @@ async def delete_user(user_id: str, email: Annotated[str, Depends(get_email)]):
     raise HTTPException(201, "User not found")
   return {"message" : "user deleted"}
 
-@app.post("/update-user/")
+@app.put("/update-user/")
 async def update_user(user : User, email: Annotated[str, Depends(get_email)]) -> User:
   try:
     users = Table('users')
@@ -73,7 +73,7 @@ async def update_user(user : User, email: Annotated[str, Depends(get_email)]) ->
     q1 = Query.from_(users).select(users.star).where(users.user_id == user.user_id)
     set_list = {}
     if user.user_type:
-      set_list['user_type'] = user.user_type
+      set_list[users.user_type] = user.user_type
     if user.email:
       set_list[users.email] = user.email
     if user.department:
