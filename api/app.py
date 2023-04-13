@@ -39,7 +39,7 @@ async def get_test(email: Annotated[str ,Depends(get_email)]):
 # USER details
 
 @app.post("/add-user")
-async def add_user(user : User):
+async def add_user(user : User, email: Annotated[str, Depends(get_email)]):
   try:
     q = Query.into('users').insert(user.user_id, user.first_name, user.last_name, user.gmail, user.user_type, user.department)
     with conn.cursor() as cur:
@@ -53,7 +53,7 @@ async def add_user(user : User):
   
 
 @app.delete("/delete-user/{user_id}")
-async def delete_user(user_id: str):
+async def delete_user(user_id: str, email: Annotated[str, Depends(get_email)]):
   try:
     users = Table('users')
     q = Query.from_(users).delete().where(users.user_id.ilike(f'{user_id}'))
@@ -66,7 +66,7 @@ async def delete_user(user_id: str):
   return {"message" : "user deleted"}
 
 @app.post("/update-user/")
-async def update_user(user : User) -> User:
+async def update_user(user : User, email: Annotated[str, Depends(get_email)]) -> User:
   try:
     users = Table('users')
     q = Query.update(users).where(users.user_id == user.user_id)

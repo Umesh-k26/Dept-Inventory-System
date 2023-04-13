@@ -4,6 +4,7 @@ import { signIn, getProviders, getSession } from "next-auth/react";
 const Home = ({ providers }) => {
   return (
     <>
+      <p className="underline font-bold">hello world</p>
       {providers &&
         Object.values(providers).map((provider) => {
           return (

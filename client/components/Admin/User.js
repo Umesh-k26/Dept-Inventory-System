@@ -1,80 +1,32 @@
-import { getSession } from "next-auth/react";
 import React, { useContext, useRef } from "react";
+import Form from "components/Form";
 
 export const AddUser = () => {
-  const baseURL = process.env.REACT_APP_API_BASEURL;
-  console.log(baseURL);
-  const userId = useRef(null);
-  const firstName = useRef(null);
-  const lastName = useRef(null);
-  const email = useRef(null);
-  const department = useRef(null);
-  const userType = useRef(null);
-
-  const addUser = async (event) => {
-    event.preventDefault();
-
-    const res = await fetch(`http://localhost:8000/add-user`, {
-      method: "POST",
-      body: JSON.stringify({
-        user_id: userId.current.value,
-        first_name: firstName.current.value,
-        last_name: lastName.current.value,
-        gmail: email.current.value,
-        user_type: userType.current.value,
-        department: department.current.value,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = res.json();
-    console.log(data);
-  };
+  const fields = [
+    { type: "text", id: "user_id", required: true, label: "User Id" },
+    { type: "text", id: "first_name", required: false, label: "First Name" },
+    { type: "text", id: "last_name", required: false, label: "Last Name" },
+    { type: "text", id: "gmail", required: true, label: "Email" },
+    { type: "text", id: "user_type", required: true, label: "User Type" },
+    { type: "text", id: "department", required: true, label: "Department" },
+  ];
+  const apiLink = "http://localhost:8000/add-user";
   return (
     <>
-      <div className="container flex">
-        <form onSubmit={addUser}>
-          <label htmlFor="user_id">User Id</label>
-          <input type="text" id="user_id" ref={userId} required />
-          <label htmlFor="first_name">First Name</label>
-          <input type="text" id="first_name" ref={firstName} />
-          <label htmlFor="last_name">Last Name</label>
-          <input type="text" id="last_name" ref={lastName} />
-          <label htmlFor="email">Email Id</label>
-          <input type="text" id="email" ref={email} required />
-          <label htmlFor="user_type">User Type</label>
-          <input type="text" id="user_type" ref={userType} required />
-          <label htmlFor="department">Department</label>
-          <input type="text" id="department" ref={department} />
-          <button type="submit">Add user</button>
-        </form>
-      </div>
+      <Form fields={fields} apiLink={apiLink} method={"POST"} />
     </>
   );
 };
 
 export const DeleteUser = () => {
-  const userId = useRef(null);
+  const fields = [
+    { type: "text", id: "user_id", required: true, label: "User Id" },
+  ];
+  const apiLink = "http://localhost:8000/delete-user/${user_id}";
 
-  const deleteUser = async () => {
-    const res = await fetch(`http://localhost:8000/${userId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  };
   return (
     <>
-      <div>
-        <form onSubmit={deleteUser}>
-          <label htmlFor="user_id">User Id</label>
-          <input type="text" id="user_id" ref={userId} required />
-
-          <button type="submit">Delete user</button>
-        </form>
-      </div>
+      <Form fields={fields} apiLink={apiLink} method={"DELETE"} />
     </>
   );
 };
