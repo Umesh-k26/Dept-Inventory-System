@@ -10,9 +10,9 @@ class AssetDetails(BaseModel):
     entry_date : datetime.date | None = None
     unit_price : float | None = None
     warranty : datetime.date | None = None
-    is_hardware : bool | None = None
+    is_hardware : str | None = None
     system_no : str | None = None
-    purchace_order_no : str | None = None
+    purchase_order_no : str | None = None
     asset_state : str | None = None
     picture : str | None = None #subject to change once we find the proper one
     order_date : datetime.date | None = None

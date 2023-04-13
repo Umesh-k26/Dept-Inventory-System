@@ -8,9 +8,10 @@ CREATE TABLE users (
     user_id VARCHAR(255) NOT NULL UNIQUE,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
-    gmail VARCHAR(255),
+    email VARCHAR(255),
     user_type VARCHAR(255),
     department VARCHAR(255),
+    user_state VARCHAR(255) DEFAULT 'Active',
     PRIMARY KEY (user_id)
 );
 
@@ -21,7 +22,7 @@ CREATE TABLE order_table(
     firm_name TEXT,
     financial_year SMALLINT,
     -- quantity INT,
-    gst_tin INT,
+    gst_tin VARCHAR(255),
     final_procurement_date DATE,
     invoice_no VARCHAR(255) NOT NULL UNIQUE,
     invoice_date DATE,
