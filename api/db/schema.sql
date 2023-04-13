@@ -40,7 +40,7 @@ CREATE TABLE asset(
     entry_date DATE,
     unit_price FLOAT,
     warranty DATE,
-    is_hardware BOOLEAN,
+    is_hardware VARCHAR(255),
     system_no VARCHAR(255),
     purchase_order_no VARCHAR(255),
     asset_state VARCHAR(255),

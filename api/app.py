@@ -145,7 +145,7 @@ def filter_user(user : Annotated[Asset, Query()]) -> list[User]:
 async def add_asset(asset : Asset):
   try:
 
-    q = Query.into('asset').insert(asset.asset_name, asset.serial_no, asset.model, asset.department, asset.asset_location, asset.asset_holder, asset.entry_date, asset.unit_price, asset.warranty, asset.is_hardware, asset.system_no, asset.purchase_order_no, asset.asset_state, asset.picture)
+    q = Query.into('asset').insert(asset.asset_name, asset.model, asset.serial_no, asset.department, asset.asset_location, asset.asset_holder, asset.entry_date, asset.unit_price, asset.warranty, asset.is_hardware, asset.system_no, asset.purchase_order_no, asset.asset_state, asset.picture)
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
     conn.commit()
@@ -213,7 +213,7 @@ async def update_asset(asset_ : Asset) -> Asset:
      print(e)
      conn.rollback()
      raise HTTPException(400, "Cant add asset")
-  return Asset.parse_obj(result)
+  return Asset.parse_obj(result[0])
 
 
 @app.post("/get-asset")
