@@ -7,3 +7,5 @@ __pycache__
 data
 
 .fuse*
+api/test.py
+my-img.png

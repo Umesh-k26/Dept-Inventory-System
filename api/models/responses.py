@@ -14,7 +14,7 @@ class AssetDetails(BaseModel):
     system_no : str | None = None
     purchase_order_no : str | None = None
     asset_state : str | None = None
-    picture : str | None = None #subject to change once we find the proper one
+    # picture : str | None = None #subject to change once we find the proper one
     order_date : datetime.date | None = None
     indentor : str | None = None
     firm_name : str | None = None
@@ -27,3 +27,18 @@ class AssetDetails(BaseModel):
     user_id : str
     first_name : str | None = None
     last_name : str | None = None
+
+class OrderDetails(BaseModel):
+    purchase_order_no : str  | None = None #primary key
+    order_date : datetime.date | None = None
+    indentor : str | None = None
+    first_name : str | None = None
+    last_name : str | None = None
+    firm_name : str | None = None
+    financial_year : int | None = None
+    gst_tin : str | None = None
+    final_procurement_date : datetime.date | None = None
+    invoice_no : str  | None = None #primary key
+    invoice_date : datetime.date | None = None
+    asset_details : dict | None = None
+
