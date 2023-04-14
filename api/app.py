@@ -346,7 +346,7 @@ async def add_order(order_ : Order_Table) -> Order_Table:
      print(e)
      conn.rollback()
      raise HTTPException(400, "Cant update order")
-  return Order_Table.parse_obj(result)
+  return Order_Table.parse_obj(result[0])
 
 @app.post("/get-order/")
 async def get_order(order_ : Order_Table):

@@ -199,32 +199,3 @@ export const UpdateAsset = () => {
 //   );
 // };
 
-
-// export const DeleteAsset = () => {
-//     const purchaseOrderNo = useRef(null);
-//     const invoiceNo = useRef(null);
-
-//     const deleteAsset = async () => {
-//       const res = await fetch(`http://localhost:8000/${purchaseOrderNo}${invoiceNo}`, {
-//         method: "DELETE",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//       });
-//     };
-//     return (
-//       <>
-//         <div>
-//           <form onSubmit={deleteAsset}>
-//             <label htmlFor="purchase_order_no">Purchase Order No</label>
-//             <input type="text" id="purchase_order_no" ref={purchaseOrderNo} required />
-
-//             <label htmlFor="invoice_no">Invoice No</label>
-//             <input type="text" id="invoice_no" ref={invoiceNo} required />
-  
-//             <button type="submit">Delete Asset</button>
-//           </form>
-//         </div>
-//       </>
-//     );
-//   };

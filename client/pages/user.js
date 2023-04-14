@@ -1,6 +1,6 @@
 import React from "react";
 import { AddAsset, DeleteAsset, UpdateAsset} from "components/User/Asset";
-import { AddOrder } from "components/User/Order"
+import { AddOrder, DeleteOrder, UpdateOrder } from "components/User/Order"
 const User = () => {
   return (
     <>
@@ -18,6 +18,11 @@ const User = () => {
       <div>Add order</div>
       <AddOrder/>
       <hr/>
+      <div>Delete Order</div>
+      <DeleteOrder/>
+      <hr/>
+      <div>Update Order</div>
+      <UpdateOrder/>
 
     </>
   );
