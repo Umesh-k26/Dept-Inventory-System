@@ -2,70 +2,116 @@ import React, { useContext, useRef } from "react";
 import Form from "components/Form";
 
 export const AddAsset = () => {
-    const fields = [
-        { type: "text", id: "asset_name", required: true, label: "Asset Name" }, 
-        { type: "text", id: "model", required: false, label: "Model" },
-        { type: "text", id: "serial_no", required: true, label: "Serial No" },
-        { type: "text", id: "asset_department", required: false, label: "Department" },
-        { type: "text", id: "asset_location", required: false, label: "Asset Location" },
-        { type: "text", id: "asset_holder", required: true, label: "Asset Holder" },
-        { type: "date", id: "entry_date", required: false, label: "Entry Date" },
-        { type: "number", id: "unit_price", required: false, label: "Unit Price" },
-        { type: "date", id: "warranty", required: false, label: "Warranty" },
-        {
-          type: "select",
-          id: "is_hardware",
-          required: false,
-          label: "Hardware",
-          options: [
-            {value: "false", label: "No"},
-            {value: "true", label: "Yes"},
-          ],
-        },
-        { type: "text", id: "system_no", required: false, label: "System No" },
-        { type: "text", id: "purchase_order_no", required: true, label: "Purchase Order No" },
-        {
-          type: "select",
-          id: "asset_state",
-          required: false,
-          label: "Asset State",
-          options: [
-            {value: "in_use", label: "In Use"},
-            {value: "in_store", label: "In Store"},
-            {value: "sold", label: "Sold"},
-          ],
-        },
-        { type: "text", id: "picture", required: false, label: "Picture" },        
-    ];
-    const apiLink = "http://localhost:8000/add-asset";
-    return (
-        <>
-            <Form fields={fields} apiLink={apiLink} method={"POST"} submitName={"Add Asset"} />
-        </>
-    );
+  const fields = [
+    { type: "text", id: "asset_name", required: true, label: "Asset Name" },
+    { type: "text", id: "model", required: false, label: "Model" },
+    { type: "text", id: "serial_no", required: true, label: "Serial No" },
+    {
+      type: "text",
+      id: "asset_department",
+      required: false,
+      label: "Department",
+    },
+    {
+      type: "text",
+      id: "asset_location",
+      required: false,
+      label: "Asset Location",
+    },
+    { type: "text", id: "asset_holder", required: true, label: "Asset Holder" },
+    { type: "date", id: "entry_date", required: false, label: "Entry Date" },
+    {
+      type: "number",
+      id: "unit_price",
+      required: false,
+      label: "Unit Price",
+      min: 0,
+    },
+    { type: "date", id: "warranty", required: false, label: "Warranty" },
+    {
+      type: "select",
+      id: "is_hardware",
+      required: false,
+      label: "Hardware",
+      options: [
+        { value: "false", label: "No" },
+        { value: "true", label: "Yes" },
+      ],
+    },
+    { type: "text", id: "system_no", required: false, label: "System No" },
+    {
+      type: "text",
+      id: "purchase_order_no",
+      required: true,
+      label: "Purchase Order No",
+    },
+    {
+      type: "select",
+      id: "asset_state",
+      required: false,
+      label: "Asset State",
+      options: [
+        { value: "in_use", label: "In Use" },
+        { value: "in_store", label: "In Store" },
+        { value: "sold", label: "Sold" },
+      ],
+    },
+    { type: "text", id: "picture", required: false, label: "Picture" },
+  ];
+  const apiLink = "http://localhost:8000/add-asset";
+  return (
+    <>
+      <Form
+        fields={fields}
+        apiLink={apiLink}
+        method={"POST"}
+        submitName={"Add Asset"}
+      />
+    </>
+  );
 };
 
 export const DeleteAsset = () => {
-    const fields = [
-      { type: "text", id: "serial_no", required: true, label: "Serial No" },
-    ];
-    const apiLink = "http://localhost:8000/delete-asset/${serial_no}";
-  
-    return (
-      <>
-        <Form fields={fields} apiLink={apiLink} method={"DELETE"} submitName={"Delete Asset"}/>
-      </>
-    );
-  };
+  const fields = [
+    { type: "text", id: "serial_no", required: true, label: "Serial No" },
+  ];
+  const apiLink = "http://localhost:8000/delete-asset/${serial_no}";
+
+  return (
+    <>
+      <Form
+        fields={fields}
+        apiLink={apiLink}
+        method={"DELETE"}
+        submitName={"Delete Asset"}
+      />
+    </>
+  );
+};
 
 export const UpdateAsset = () => {
   const fields = [
     { type: "text", id: "serial_no", required: true, label: "Serial No" },
-    { type: "text", id: "asset_name", required: false, label: "Asset Name" }, 
+    { type: "text", id: "asset_name", required: false, label: "Asset Name" },
     { type: "text", id: "model", required: false, label: "Model" },
-    { type: "text", id: "asset_department", required: false, label: "Department" },
-    { type: "text", id: "asset_location", required: false, label: "Asset Location" },
-    { type: "text", id: "asset_holder", required: false, label: "Asset Holder" },
+    {
+      type: "text",
+      id: "asset_department",
+      required: false,
+      label: "Department",
+    },
+    {
+      type: "text",
+      id: "asset_location",
+      required: false,
+      label: "Asset Location",
+    },
+    {
+      type: "text",
+      id: "asset_holder",
+      required: false,
+      label: "Asset Holder",
+    },
     { type: "date", id: "entry_date", required: false, label: "Entry Date" },
     { type: "number", id: "unit_price", required: false, label: "Unit Price" },
     { type: "date", id: "warranty", required: false, label: "Warranty" },
@@ -75,26 +121,31 @@ export const UpdateAsset = () => {
       required: false,
       label: "Hardware",
       options: [
-        {value: "false", label: "No"},
-        {value: "true", label: "Yes"},
+        { value: "false", label: "No" },
+        { value: "true", label: "Yes" },
       ],
     },
     { type: "text", id: "system_no", required: false, label: "System No" },
-    { type: "text", id: "purchase_order_no", required: false, label: "Purchase Order No" },
+    {
+      type: "text",
+      id: "purchase_order_no",
+      required: false,
+      label: "Purchase Order No",
+    },
     {
       type: "select",
       id: "asset_state",
       required: false,
       label: "Asset State",
       options: [
-        {value: "in_use", label: "In Use"},
-        {value: "in_store", label: "In Store"},
-        {value: "sold", label: "Sold"},
+        { value: "in_use", label: "In Use" },
+        { value: "in_store", label: "In Store" },
+        { value: "sold", label: "Sold" },
       ],
     },
-    { type: "text", id: "picture", required: false, label: "Picture" },        
+    { type: "text", id: "picture", required: false, label: "Picture" },
   ];
-  
+
   const apiLink = "http://localhost:8000/update-asset";
   return (
     <>
@@ -107,9 +158,6 @@ export const UpdateAsset = () => {
     </>
   );
 };
-
-
-
 
 // export const AddAsset = () => {
 //   const baseURL = process.env.REACT_APP_API_BASEURL;
@@ -128,7 +176,6 @@ export const UpdateAsset = () => {
 //   const purchaseOrderNo = useRef(null);
 //   const assetState = useRef(null);
 //   const assetPicture = useRef(null);
-  
 
 //   const addAsset = async (event) => {
 //     event.preventDefault();
@@ -198,4 +245,3 @@ export const UpdateAsset = () => {
 //     </>
 //   );
 // };
-

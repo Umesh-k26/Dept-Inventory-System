@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useSession } from "next-auth/react";
+import Container from "./Container";
 
 // const FormField = ({ type, id, required, label, inputRef }) => {
 //   return (
@@ -44,6 +45,8 @@ const FormField = ({ field, inputRefs }) => {
             name={id}
             ref={inputRefs[id]}
             required={required}
+            min={field?.min}
+            max={field?.max}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
@@ -76,7 +79,7 @@ const FormField = ({ field, inputRefs }) => {
             name={id}
             ref={inputRefs[id]}
             required={required}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             {options.map((option) => (
               <option key={option.value} value={option.value}>
@@ -214,17 +217,25 @@ const Form = ({ fields, apiLink, method, submitName }) => {
   };
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit}>
-      {fields.map((field) => (
-        <FormField field={field} inputRefs={inputRefs} />
-      ))}
-      <button
-        type="submit"
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+    <Container>
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-96 bg-slate-400"
       >
-        {submitName}
-      </button>
-    </form>
+        {fields.map((field) => (
+          <FormField key={field.id} field={field} inputRefs={inputRefs} />
+        ))}
+        <div className="pt-6">
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            {submitName}
+          </button>
+        </div>
+      </form>
+    </Container>
   );
 };
 

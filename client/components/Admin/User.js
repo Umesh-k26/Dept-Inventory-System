@@ -84,3 +84,21 @@ export const UpdateUser = () => {
     </>
   );
 };
+
+export const GetUsers = () => {
+  const fields = [
+    { type: "text", id: "user_id", required: true, label: "User Id" },
+  ];
+  const apiLink = "http://localhost:8000/get-user/${user_id}";
+
+  return (
+    <>
+      <Form
+        fields={fields}
+        apiLink={apiLink}
+        method={"GET"}
+        submitName={"Get User"}
+      />
+    </>
+  );
+};

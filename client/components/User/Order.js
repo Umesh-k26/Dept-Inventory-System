@@ -1,18 +1,41 @@
 import React, { useContext, useRef } from "react";
 import Form from "components/Form";
 
-
 export const AddOrder = () => {
+  const date = new Date();
+  const year = date.getFullYear();
   const fields = [
-    { type: "text", id: "purchase_order_no", required: true, label: "Purchase Order No" },
+    {
+      type: "text",
+      id: "purchase_order_no",
+      required: true,
+      label: "Purchase Order No",
+    },
     { type: "date", id: "orderDate", required: false, label: "Order Date" },
     { type: "text", id: "indentor", required: true, label: "Indentor" },
     { type: "text", id: "firm_name", required: false, label: "Firm Name" },
-    { type: "number", id: "financial_year", required: false, label: "Financial Year" },
+    {
+      type: "number",
+      id: "financial_year",
+      required: false,
+      label: "Financial Year",
+      min: 2000,
+      max: year,
+    },
     { type: "text", id: "gst_tin", required: false, label: "GST TIN" },
-    { type: "date", id: "final_procurement_date", required: false, label: "Final Procurement Date" },
+    {
+      type: "date",
+      id: "final_procurement_date",
+      required: false,
+      label: "Final Procurement Date",
+    },
     { type: "text", id: "invoice_no", required: true, label: "Invoice No" },
-    { type: "date", id: "invoice_date", required: false, label: "Invoice Date" }, 
+    {
+      type: "date",
+      id: "invoice_date",
+      required: false,
+      label: "Invoice Date",
+    },
   ];
   const apiLink = "http://localhost:8000/add-order";
   return (
@@ -27,13 +50,18 @@ export const AddOrder = () => {
   );
 };
 
-
 export const DeleteOrder = () => {
   const fields = [
-    { type: "text", id: "purchase_order_no", required: true, label: "Purchase Order No" },
+    {
+      type: "text",
+      id: "purchase_order_no",
+      required: true,
+      label: "Purchase Order No",
+    },
     { type: "text", id: "invoice_no", required: true, label: "Invoice No" },
   ];
-  const apiLink = "http://localhost:8000/delete-order/${purchase_order_no}${invoice_no}";
+  const apiLink =
+    "http://localhost:8000/delete-order/${purchase_order_no}${invoice_no}";
   return (
     <>
       <Form
@@ -46,18 +74,41 @@ export const DeleteOrder = () => {
   );
 };
 
-
 export const UpdateOrder = () => {
+  const date = new Date();
+  const year = date.getFullYear();
   const fields = [
-    { type: "text", id: "purchase_order_no", required: true, label: "Purchase Order No" },
+    {
+      type: "text",
+      id: "purchase_order_no",
+      required: true,
+      label: "Purchase Order No",
+    },
     { type: "date", id: "orderDate", required: false, label: "Order Date" },
     { type: "text", id: "indentor", required: false, label: "Indentor" },
     { type: "text", id: "firm_name", required: false, label: "Firm Name" },
-    { type: "number", id: "financial_year", required: false, label: "Financial Year" },
+    {
+      type: "number",
+      id: "financial_year",
+      required: false,
+      label: "Financial Year",
+      min: 2000,
+      max: year,
+    },
     { type: "text", id: "gst_tin", required: false, label: "GST TIN" },
-    { type: "date", id: "final_procurement_date", required: false, label: "Final Procurement Date" },
+    {
+      type: "date",
+      id: "final_procurement_date",
+      required: false,
+      label: "Final Procurement Date",
+    },
     { type: "text", id: "invoice_no", required: true, label: "Invoice No" },
-    { type: "date", id: "invoice_date", required: false, label: "Invoice Date" }, 
+    {
+      type: "date",
+      id: "invoice_date",
+      required: false,
+      label: "Invoice Date",
+    },
   ];
   const apiLink = "http://localhost:8000/update-order";
   return (
@@ -72,7 +123,6 @@ export const UpdateOrder = () => {
   );
 };
 
-
 // export const AddOrder = () => {
 //   const baseURL = process.env.REACT_APP_API_BASEURL;
 //   console.log(baseURL);
@@ -85,7 +135,6 @@ export const UpdateOrder = () => {
 //   const finalProcurementDate = useRef(null);
 //   const invoiceNo = useRef(null);
 //   const invoiceDate = useRef(null);
-
 
 //   const addOrder = async (event) => {
 //     event.preventDefault();
@@ -102,7 +151,6 @@ export const UpdateOrder = () => {
 //         final_procurement_date: finalProcurementDate.current.value == "" ? null : finalProcurementDate.current.value,
 //         invoice_no: invoiceNo.current.value,
 //         invoice_date: invoiceDate.current.value == "" ? null : invoiceDate.current.value,
-
 
 //       }),
 //       headers: {
@@ -163,7 +211,7 @@ export const UpdateOrder = () => {
 
 //             <label htmlFor="invoice_no">Invoice No</label>
 //             <input type="text" id="invoice_no" ref={invoiceNo} required />
-  
+
 //             <button type="submit">Delete Order</button>
 //           </form>
 //         </div>
