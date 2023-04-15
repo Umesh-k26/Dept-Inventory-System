@@ -6,7 +6,7 @@ export const AddUser = () => {
     { type: "text", id: "user_id", required: true, label: "User Id" },
     { type: "text", id: "first_name", required: false, label: "First Name" },
     { type: "text", id: "last_name", required: false, label: "Last Name" },
-    { type: "text", id: "gmail", required: true, label: "Email" },
+    { type: "text", id: "email", required: true, label: "Email" },
     {
       type: "select",
       id: "user_type",
@@ -57,7 +57,7 @@ export const UpdateUser = () => {
     { type: "text", id: "user_id", required: true, label: "User Id" },
     { type: "text", id: "first_name", required: false, label: "First Name" },
     { type: "text", id: "last_name", required: false, label: "Last Name" },
-    { type: "text", id: "gmail", required: false, label: "Email" },
+    { type: "text", id: "email", required: false, label: "Email" },
     {
       type: "select",
       id: "user_type",

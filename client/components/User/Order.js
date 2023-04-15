@@ -11,13 +11,13 @@ export const AddOrder = () => {
       required: true,
       label: "Purchase Order No",
     },
-    { type: "date", id: "orderDate", required: false, label: "Order Date" },
+    { type: "date", id: "orderDate", required: true, label: "Order Date" },
     { type: "text", id: "indentor", required: true, label: "Indentor" },
     { type: "text", id: "firm_name", required: false, label: "Firm Name" },
     {
       type: "number",
       id: "financial_year",
-      required: false,
+      required: true,
       label: "Financial Year",
       min: 2000,
       currentYear: year,
@@ -26,14 +26,14 @@ export const AddOrder = () => {
     {
       type: "date",
       id: "final_procurement_date",
-      required: false,
+      required: true,
       label: "Final Procurement Date",
     },
     { type: "text", id: "invoice_no", required: true, label: "Invoice No" },
     {
       type: "date",
       id: "invoice_date",
-      required: false,
+      required: true,
       label: "Invoice Date",
     },
   ];
@@ -45,6 +45,9 @@ export const AddOrder = () => {
         apiLink={apiLink}
         method={"POST"}
         submitName={"Add Order"}
+        headers={{
+          "Content-Type": "application/json",
+        }}
       />
     </>
   );
@@ -84,13 +87,13 @@ export const UpdateOrder = () => {
       required: true,
       label: "Purchase Order No",
     },
-    { type: "date", id: "orderDate", required: false, label: "Order Date" },
+    { type: "date", id: "order_date", required: false, label: "Order Date" },
     { type: "text", id: "indentor", required: false, label: "Indentor" },
     { type: "text", id: "firm_name", required: false, label: "Firm Name" },
     {
       type: "number",
       id: "financial_year",
-      required: false,
+      required: true,
       label: "Financial Year",
       min: 2000,
       currentYear: year,
@@ -99,14 +102,14 @@ export const UpdateOrder = () => {
     {
       type: "date",
       id: "final_procurement_date",
-      required: false,
+      required: true,
       label: "Final Procurement Date",
     },
     { type: "text", id: "invoice_no", required: true, label: "Invoice No" },
     {
       type: "date",
       id: "invoice_date",
-      required: false,
+      required: true,
       label: "Invoice Date",
     },
   ];

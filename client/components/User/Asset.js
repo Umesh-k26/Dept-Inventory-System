@@ -8,7 +8,7 @@ export const AddAsset = () => {
     { type: "text", id: "serial_no", required: true, label: "Serial No" },
     {
       type: "text",
-      id: "asset_department",
+      id: "department",
       required: false,
       label: "Department",
     },
@@ -96,7 +96,7 @@ export const UpdateAsset = () => {
     { type: "text", id: "model", required: false, label: "Model" },
     {
       type: "text",
-      id: "asset_department",
+      id: "department",
       required: false,
       label: "Department",
     },
@@ -159,6 +159,9 @@ export const UpdateAsset = () => {
   );
 };
 
+export const AllAssets = () => {
+
+}
 // export const AddAsset = () => {
 //   const baseURL = process.env.REACT_APP_API_BASEURL;
 //   console.log(baseURL);

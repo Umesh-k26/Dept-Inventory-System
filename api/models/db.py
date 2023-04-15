@@ -42,7 +42,7 @@ class Asset(BaseModel):
     system_no : str | None = None
     purchase_order_no : str | None = None
     asset_state : str | None = None
-    # picture : UploadFile | None = None #subject to change once we find the proper one
+    picture : UploadFile | None = None #subject to change once we find the proper one
 
     @classmethod
     def __get_validators__(cls):

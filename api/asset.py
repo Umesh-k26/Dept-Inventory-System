@@ -1,7 +1,7 @@
-from fastapi import Depends, HTTPException, UploadFile, File, Body
+from fastapi import Depends, HTTPException, UploadFile, File, Body, Request
 from typing import Annotated
 from configs import Config
-from pypika import Query, Table, Criterion
+from pypika import PostgreSQLQuery as Query, Table, Criterion
 from psycopg2 import Binary
 
 from db.connect import conn
@@ -22,20 +22,31 @@ origins = [
 #ASSET details
 
 @router_asset.post("/add-asset")
-async def add_asset(asset_: Annotated[Asset, Body()], picture: UploadFile = File(...)):
+async def add_asset(req : Request):
+  formData = await req.form()
+
+  asset = dict()
+  for key in formData.keys():
+    if formData.get(key) == '':
+      asset[key] = None
+    else:
+      asset[key] = formData.get(key)
+  
+  if asset['picture'] is not None:
+    pic = await asset['picture'].read()
+    pic = Binary(pic)
+  else:
+    pic = None
+  print(asset)
   try:
-    pic = await picture.read()
-    # pic = base64.b64encode(pic)
-    print(type(pic))
-    print(asset_)
-    q = Query.into('asset').insert(asset_.asset_name, asset_.model, asset_.serial_no, asset_.department, asset_.asset_location, asset_.asset_holder, asset_.entry_date, asset_.unit_price, asset_.warranty, asset_.is_hardware, asset_.system_no, asset_.purchase_order_no, asset_.asset_state,Binary(pic))
+    q = Query.into('asset').insert(asset['asset_name'], asset['model'], asset['serial_no'], asset['department'], asset['asset_location'], asset['asset_holder'], asset['entry_date'], asset['unit_price'], asset['warranty'], asset['is_hardware'], asset['system_no'], asset['purchase_order_no'], asset['asset_state'], pic)
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
     conn.commit()
   except Exception as e:
      print(e)
      conn.rollback()
-     raise HTTPException(400, "Cant add asset")
+     raise HTTPException(e)
   return {"message" : "asset added"}
   
 

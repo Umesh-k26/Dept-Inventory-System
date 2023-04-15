@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException
 from typing import Annotated
 from auth import get_email
 from configs import Config
-from pypika import Query, Table, Criterion
+from pypika import PostgreSQLQuery as Query, Table, Criterion
 
 from db.connect import conn
 
@@ -19,9 +19,10 @@ origins = [
 # USER details
 
 @router_user.post("/add-user")
-async def add_user(user : User):
+async def add_user(user : User, email: Annotated[str, Depends(get_email)]):
   try:
-    q = Query.into('users').insert(user.user_id, user.first_name, user.last_name, user.email, user.user_type, user.department)
+    users = Table('users')
+    q = Query.into(users).insert(user.user_id, user.first_name, user.last_name, user.email, user.user_type, user.department).on_conflict(users.user_id).do_update(users.user_state, 'Active')
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
     conn.commit()
@@ -31,12 +32,13 @@ async def add_user(user : User):
      raise HTTPException(400, "Cant add user")
   return {"message": "user added"}
   
+  
 
 @router_user.delete("/delete-user/{user_id}")
 async def delete_user(user_id: str):
   try:
     users = Table('users')
-    q = Query.update(users).where(users.user_id.ilike(f'{user_id}')).set(users.user_state, 'Unactive')
+    q = Query.update(users).where(users.user_id.ilike(f'{user_id}')).set(users.user_state, 'Inactive')
     with conn.cursor() as cur:
         cur.execute(q.get_sql())
     conn.commit()

@@ -9,8 +9,10 @@ from configs import Config
 async def get_email(request: Request):
     try:
         print('came here')
+        # print()
         token = request.headers.get("Authorization")
-        # print(token)
+        if token is None:
+            print('Token is null')
         idinfo = id_token.verify_oauth2_token(
             token, requests.Request(), Config.GOOGLE_CLIENT_ID
         )

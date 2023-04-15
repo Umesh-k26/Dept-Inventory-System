@@ -1,26 +1,8 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import Container from "./Container";
 
-// const FormField = ({ type, id, required, label, inputRef }) => {
-//   return (
-//     <div className="mb-4">
-//       <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
-//         {label}
-//         {required && <span className="text-red-500">*</span>}
-//       </label>
-//       <input
-//         type={type}
-//         id={id}
-//         name={id}
-//         required={required}
-//         ref={inputRef}
-//         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-//       />
-//     </div>
-//   );
-// };
-const FormField = ({ field, inputRefs }) => {
+const FormField = ({ field }) => {
   const { id, type, required, label, options } = field;
 
   switch (type) {
@@ -43,7 +25,7 @@ const FormField = ({ field, inputRefs }) => {
             type={type}
             id={id}
             name={id}
-            ref={inputRefs[id]}
+            // ref={inputRefs[id]}
             required={required}
             min={field?.min}
             max={field?.currentYear}
@@ -62,7 +44,7 @@ const FormField = ({ field, inputRefs }) => {
           <textarea
             id={id}
             name={id}
-            ref={inputRefs[id]}
+            // ref={inputRefs[id]}
             required={required}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           ></textarea>
@@ -78,7 +60,7 @@ const FormField = ({ field, inputRefs }) => {
           <select
             id={id}
             name={id}
-            ref={inputRefs[id]}
+            // ref={inputRefs[id]}
             required={required}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
@@ -97,7 +79,7 @@ const FormField = ({ field, inputRefs }) => {
             type="checkbox"
             id={id}
             name={id}
-            ref={inputRefs[id]}
+            // ref={inputRefs[id]}
             required={required}
             className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2"
           />
@@ -117,7 +99,7 @@ const FormField = ({ field, inputRefs }) => {
                 type="radio"
                 id={option.id}
                 name={id}
-                ref={inputRefs[option.id]}
+                // ref={inputRefs[option.id]}
                 value={option.value}
                 required={required}
                 className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2"
@@ -140,7 +122,7 @@ const FormField = ({ field, inputRefs }) => {
             type={type}
             id={id}
             name={id}
-            ref={inputRefs[id]}
+            // ref={inputRefs[id]}
             required={required}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
@@ -158,7 +140,7 @@ const FormField = ({ field, inputRefs }) => {
             accept="image/*"
             id={id}
             name={id}
-            ref={inputRefs[id]}
+            // ref={inputRefs[id]}
             required={required}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
@@ -169,46 +151,52 @@ const FormField = ({ field, inputRefs }) => {
   }
 };
 
-const Form = ({ fields, apiLink, method, submitName }) => {
+const Form = ({ fields, apiLink, method, submitName, headers }) => {
   const { data: session, status } = useSession();
   const formRef = useRef(null);
-  const inputRefs = fields.reduce((acc, field) => {
-    acc[field.id] = useRef(null);
-    return acc;
-  }, {});
+  // const inputRefs = fields.reduce((acc, field) => {
+  //   acc[field.id] = useRef(null);
+  //   return acc;
+  // }, {});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = {};
-    fields.forEach((field) => {
-      if (field.type == "file") {
-        const file = inputRefs[field.id].current.files[0];
-        const fileData = new FormData();
-        fileData.append("image", file);
-        formData[field.id] = fileData;
-      } else {
-        formData[field.id] = inputRefs[field.id].current.value;
-        if (inputRefs[field.id].current.value === "") formData[field.id] = null;
-      }
-      console.log(inputRefs[field.id].current);
+    const formData = new FormData(formRef.current);
+    formData.forEach((value, key) => {
+      if (value == "") formData[key] = null;
     });
-    // return;
+
+    let reqBody = {};
+
+    if (headers?.["Content-Type"] === "multipart/form-data") reqBody = formData;
+    else formData.forEach((val, key) => (reqBody[key] = val));
+
+    console.log(reqBody);
     try {
       let apiLinkWithParams = apiLink;
       // Replace placeholders in apiLink with corresponding form data
-      Object.keys(formData).forEach((key) => {
+      Object.keys(reqBody).forEach((key) => {
+        console.log(key);
         apiLinkWithParams = apiLinkWithParams.replace(
           `\${${key}}`,
-          formData[key]
+          reqBody[key]
         );
       });
+      console.log(apiLinkWithParams);
+      console.log(headers);
+      let reqHeaders = headers;
+      if (!headers) {
+        console.log("came here line 191");
+        reqBody = JSON.stringify(reqBody);
+        reqHeaders = { "Content-Type": "application/json" };
+      }
       const res = await fetch(apiLinkWithParams, {
         method: method,
         headers: {
           Authorization: session.accessToken,
-          "Content-Type": "application/json",
+          ...reqHeaders,
         },
-        body: JSON.stringify(formData),
+        body: reqBody,
       });
       const data = await res.json();
       console.log(data);
@@ -222,10 +210,10 @@ const Form = ({ fields, apiLink, method, submitName }) => {
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-96 bg-slate-400"
+        className="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-96 bg-slate-400 mx-auto  "
       >
         {fields.map((field) => (
-          <FormField key={field.id} field={field} inputRefs={inputRefs} />
+          <FormField key={field.id} field={field} />
         ))}
         <div className="pt-6">
           <button

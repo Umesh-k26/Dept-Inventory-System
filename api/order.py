@@ -1,7 +1,5 @@
-from fastapi import Depends, HTTPException
-from typing import Annotated
-from configs import Config
-from pypika import Query, Table, Criterion
+from fastapi import HTTPException
+from pypika import PostgreSQLQuery as Query, Table, Criterion
 from pypika import functions as fn
 
 from db.connect import conn
@@ -11,8 +9,6 @@ from fastapi import APIRouter
 
 from models.db import Order_Table
 from models.responses import OrderDetails
-
-import datetime
 
 router_order = APIRouter()
 
