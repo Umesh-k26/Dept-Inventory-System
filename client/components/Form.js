@@ -207,6 +207,9 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
 
   return (
     <Container>
+      <div className="mx-auto flex justify-center">
+        <h1>{submitName}</h1>
+      </div>
       <form
         ref={formRef}
         onSubmit={handleSubmit}

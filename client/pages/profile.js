@@ -1,17 +1,28 @@
 import React from "react";
-import { signOut, useSession } from "next-auth/react";
-import { AssetDetails } from "components/Admin/AssetDetails";
-// import { useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 
-const Profile = () => {
-  const { data: session, status } = useSession();
+const Profile = ({ session }) => {
+  if (!session) return <p>Loading...</p>;
   return (
-    <>
+    <div>
       <div>Welcome {session?.user.name}</div>
-      <AssetDetails />
-      <button onClick={() => signOut({ callbackUrl: "/" })}>Sign Out</button>
-    </>
+    </div>
   );
 };
 
 export default Profile;
+
+export async function getServerSideProps(context) {
+  const { req } = context;
+  const session = await getSession({ req });
+  if (!session) {
+    return {
+      redirect: { destination: "/", shallow: true },
+    };
+  }
+  return {
+    props: {
+      session,
+    },
+  };
+}

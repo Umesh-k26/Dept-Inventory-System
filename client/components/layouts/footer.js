@@ -1,14 +1,12 @@
 const Footer = () => {
   return (
     <footer className="bg-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <div className="flex flex-wrap justify-between">
           <div className="w-full md:w-1/3 lg:w-1/4 px-4 mb-8 md:mb-0">
-            <h3 className="text-white font-bold mb-2">Company Name</h3>
+            <h3 className="text-white font-bold mb-2">IIT Hyderabad</h3>
             <p className="text-gray-400">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-              tristique, tellus sit amet finibus commodo, augue tellus malesuada
-              lorem, in dapibus mi metus eget mi.
+              Department Inventory System
             </p>
           </div>
           <div className="w-full md:w-1/3 lg:w-1/4 px-4 mb-8 md:mb-0">
@@ -74,7 +72,7 @@ const Footer = () => {
         </div>
         <div className="border-t border-gray-700 pt-8 pb-8">
           <p className="text-sm text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} Company Name. All rights reserved.
+            &copy; {new Date().getFullYear()} IIT Hyderabad. All rights reserved.
           </p>
         </div>
       </div>
