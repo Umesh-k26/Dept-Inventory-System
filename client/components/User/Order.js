@@ -20,7 +20,7 @@ export const AddOrder = () => {
       required: false,
       label: "Financial Year",
       min: 2000,
-      max: year,
+      currentYear: year,
     },
     { type: "text", id: "gst_tin", required: false, label: "GST TIN" },
     {
@@ -93,7 +93,7 @@ export const UpdateOrder = () => {
       required: false,
       label: "Financial Year",
       min: 2000,
-      max: year,
+      currentYear: year,
     },
     { type: "text", id: "gst_tin", required: false, label: "GST TIN" },
     {

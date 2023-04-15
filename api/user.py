@@ -129,13 +129,15 @@ async def get_all_user():
         results = cur.fetchall()
     list_ = []
     print(results)
-    data = [['user_id', 'first_name', 'last_name', 'email', 'user_type', 'department', 'user_state']]
+    temp = []
+    data = ['user_id', 'first_name', 'last_name', 'email', 'user_type', 'department', 'user_state']
     for i in results:
         for j in i:
           print(i[j])
           list_.append(i[j])
           print(list_)
-        data.append(list_.copy())
+        temp.append(list_.copy())
         list_.clear()
+    # data.append(temp.copy())
     print(data)
-    return data
+    return {"column_name" : data, "values" : temp}

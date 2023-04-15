@@ -46,7 +46,8 @@ const FormField = ({ field, inputRefs }) => {
             ref={inputRefs[id]}
             required={required}
             min={field?.min}
-            max={field?.max}
+            max={field?.currentYear}
+            // placeholder={field?.currentYear}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>

@@ -56,7 +56,7 @@ export const AddAsset = () => {
         { value: "sold", label: "Sold" },
       ],
     },
-    { type: "text", id: "picture", required: false, label: "Picture" },
+    { type: "image", id: "picture", required: false, label: "Picture" },
   ];
   const apiLink = "http://localhost:8000/add-asset";
   return (

@@ -1,6 +1,9 @@
 import React from "react";
 import { AddAsset, DeleteAsset, UpdateAsset} from "components/User/Asset";
 import { AddOrder, DeleteOrder, UpdateOrder } from "components/User/Order"
+import DataTable from "components/Table";
+
+
 const User = () => {
   return (
     <>
@@ -23,6 +26,10 @@ const User = () => {
       <hr/>
       <div>Update Order</div>
       <UpdateOrder/>
+      <DataTable
+        apiLink={"http://localhost:8000/get-all-user"}
+        method={"GET"}
+      />
 
     </>
   );
