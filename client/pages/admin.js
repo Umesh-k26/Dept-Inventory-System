@@ -6,11 +6,11 @@ import DataTable from "components/Table";
 const Admin = () => {
   return (
     <>
-      <DataTable
+      {/* <DataTable
         apiLink={"http://localhost:8000/get-all-user"}
         method={"GET"}
         tableName={"Users List"}
-      />
+      /> */}
       <DataTable />
       <AddUser />
       <DeleteUser />
