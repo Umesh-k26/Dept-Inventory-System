@@ -10,6 +10,9 @@ from fastapi import APIRouter
 from models.db import Order_Table
 from models.responses import OrderDetails
 
+from models.email import email, conf 
+from fastapi_mail import  FastMail, MessageSchema, MessageType
+
 router_order = APIRouter()
 
 origins = [
@@ -22,10 +25,28 @@ origins = [
 @router_order.post("/add-order")
 async def add_order(order : Order_Table):
   try:
+    print(order)
     q = Query.into('order_table').insert(order.purchase_order_no, order.order_date, order.indentor, order.firm_name, order.financial_year, order.gst_tin, order.final_procurement_date, order.invoice_no, order.invoice_date)
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
     conn.commit()
+    # q1 = Query.from_(order).select(order.purchase_order_no, order.order_date, order.indentor, order.firm_name, order.financial_year, order.gst_tin, order.final_procurement_date, order.invoice_no, order.invoice_date)
+    # with conn.cursor() as cur:
+    #    cur.execute(q1.get_sql())
+    #    result = cur.fetchall()
+    # result_str = ''
+    # for i in result[0]:
+    #   result_str += i + " : " + str(result[0][i]) + "<br>"
+
+    # message = MessageSchema(
+    #     subject="Order Added",
+    #     recipients=email.dict().get("email"),
+    #     body="Dear Admin,<br> The order with the following details has been added. <br>" + result_str,
+    #     subtype=MessageType.html)
+
+    # fm = FastMail(conf)
+    # await fm.send_message(message)
+
   except Exception as e:
      print(e)
      conn.rollback()
@@ -37,10 +58,27 @@ async def add_order(order : Order_Table):
 async def delete_asset(purchase_order_no : str, invoice_no : str):
   try:
     order = Table('order_table')
+    q1 = Query.from_(order).select(order.purchase_order_no, order.invoice_no)
     q = Query.from_(order).delete().where(order.purchase_order_no.ilike(f'%{purchase_order_no}%') & order.invoice_no.ilike(f'%{invoice_no}%'))
     with conn.cursor() as cur:
+        cur.execute(q1.get_sql())
+        result = cur.fetchall()
         cur.execute(q.get_sql())
     conn.commit()
+
+    result_str = ''
+    for i in result[0]:
+      result_str += i + " : " + str(result[0][i]) + "<br>"
+
+    message = MessageSchema(
+        subject="Order Deleted",
+        recipients=email.dict().get("email"),
+        body="Dear Admin,<br> The order with the following details has been deleted. <br>" + result_str,
+        subtype=MessageType.html)
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+
   except Exception as e:
     print(e)
     raise HTTPException(201, "Order not found")
@@ -75,6 +113,20 @@ async def update_order(order_ : Order_Table) -> Order_Table:
        cur.execute(q1.get_sql())
        result = cur.fetchall()
     conn.commit()
+
+    result_str = ''
+    for i in result[0]:
+      result_str += i + " : " + str(result[0][i]) + "<br>"
+
+    message = MessageSchema(
+        subject="Order Updated",
+        recipients=email.dict().get("email"),
+        body="Dear Admin,<br> The order with the following details has been updated. <br>" + result_str,
+        subtype=MessageType.html)
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+
   except Exception as e:
      print(e)
      conn.rollback()

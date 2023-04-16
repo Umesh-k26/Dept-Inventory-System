@@ -172,6 +172,9 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
     else formData.forEach((val, key) => (reqBody[key] = val));
 
     console.log(reqBody);
+    for (let k in reqBody){
+      if(reqBody[k] == "") reqBody[k] = null;
+    }
     try {
       let apiLinkWithParams = apiLink;
       // Replace placeholders in apiLink with corresponding form data
@@ -184,7 +187,7 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
       });
       console.log(apiLinkWithParams);
       console.log(headers);
-      let reqHeaders = headers;
+      let reqHeaders = {};
       if (!headers) {
         console.log("came here line 191");
         reqBody = JSON.stringify(reqBody);

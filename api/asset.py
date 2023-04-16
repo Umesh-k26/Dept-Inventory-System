@@ -12,6 +12,9 @@ from models.responses import AssetDetails
 import datetime
 from fastapi import APIRouter
 
+from fastapi_mail import FastMail, MessageSchema, MessageType
+
+from models.email import email, conf 
 
 router_asset = APIRouter()
 
@@ -39,10 +42,32 @@ async def add_asset(req : Request):
     pic = None
   print(asset)
   try:
+    asset_ = Table('asset')
     q = Query.into('asset').insert(asset['asset_name'], asset['model'], asset['serial_no'], asset['department'], asset['asset_location'], asset['asset_holder'], asset['entry_date'], asset['unit_price'], asset['warranty'], asset['is_hardware'], asset['system_no'], asset['purchase_order_no'], asset['asset_state'], pic)
+    q1 = Query.from_(asset_).select(asset_.star).where(asset_.serial_no == asset['serial_no'])
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
+      #  cur.execute(q1.get_sql())
+      #  result = cur.fetchall()
     conn.commit()
+
+    with conn.cursor() as cur:
+       cur.execute(q1.get_sql())
+       result = cur.fetchall()
+
+    result_str = ''
+    for i in result[0]:
+      result_str += i + " : " + str(result[0][i]) + "<br>"
+
+    message = MessageSchema(
+        subject="Asset Added",
+        recipients=email.dict().get("email"),
+        body="Dear Admin,<br> The asset with the following details has been added. <br>" + result_str,
+        subtype=MessageType.html)
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+    
   except Exception as e:
      print(e)
      conn.rollback()
@@ -54,10 +79,27 @@ async def add_asset(req : Request):
 async def delete_asset(serial_no : str):
   try:
     asset = Table('asset')
+    q1 = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_location, asset.asset_holder).where(asset.serial_no == serial_no)
     q = Query.from_(asset).delete().where(asset.serial_no.ilike(f'{serial_no}'))
     with conn.cursor() as cur:
+        cur.execute(q1.get_sql()) 
+        result = cur.fetchall()
         cur.execute(q.get_sql())
     conn.commit()
+
+    result_str = ''
+    for i in result[0]:
+      result_str += i + " : " + str(result[0][i]) + "<br>"
+
+    message = MessageSchema(
+        subject="Asset Deleted",
+        recipients=email.dict().get("email"),
+        body="Dear Admin,<br> The asset with the following details has been deleted. <br>" + result_str,
+        subtype=MessageType.html)
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+
   except Exception as e:
     print(e)
     raise HTTPException(201, "Asset not found")
@@ -66,11 +108,15 @@ async def delete_asset(serial_no : str):
 
 @router_asset.put("/update-asset/")
 async def update_asset(asset_ : Asset):
-  # picture ka data type check karna hai
+  # changes in asset_. to asset['']
   try:
+    print(asset_)
     asset = Table('asset')
-    q = Query.update(asset).where(asset.serial_no == asset_.serial_no)
-    q1 = Query.from_(asset).select(asset.star).where(asset.serial_no == asset_.serial_no)
+    print(asset.serial_no)
+    q = Query.update(asset).where(asset.serial_no == asset_['serial_no'])
+    print("h2")
+    q1 = Query.from_(asset).select(asset.star).where(asset.serial_no == asset_['serial_no'])
+    print("h1")
     set_list = {}
     if asset_.asset_name:
       set_list['asset_name'] = asset_.asset_name
@@ -103,6 +149,20 @@ async def update_asset(asset_ : Asset):
        cur.execute(q1.get_sql())
        result = cur.fetchall()
     conn.commit()
+
+    result_str = ''
+    for i in result[0]:
+      result_str += i + " : " + str(result[0][i]) + "<br>"
+
+    message = MessageSchema(
+        subject="Asset Updated",
+        recipients=email.dict().get("email"),
+        body="Dear Admin,<br> The asset with the following details has been updated. <br>" + result_str,
+        subtype=MessageType.html)
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+
     print(result)
   except Exception as e:
      print(e)

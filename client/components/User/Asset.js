@@ -66,6 +66,9 @@ export const AddAsset = () => {
         apiLink={apiLink}
         method={"POST"}
         submitName={"Add Asset"}
+        headers = {{
+          "Content-Type": "multipart/form-data"
+        }}
       />
     </>
   );
