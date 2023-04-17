@@ -2,6 +2,8 @@ import React, { useContext, useRef } from "react";
 import Form from "components/Form";
 
 export const AddAsset = () => {
+  const date = new Date();
+  const year = date.getFullYear();
   const fields = [
     { type: "text", id: "asset_name", required: true, label: "Asset Name" },
     { type: "text", id: "model", required: false, label: "Model" },
@@ -20,15 +22,15 @@ export const AddAsset = () => {
       label: "Asset Location",
     },
     { type: "text", id: "asset_holder", required: true, label: "Asset Holder" },
-    { 
+    {
       type: "select",
-      id: "asset_type", 
-      required: false, 
+      id: "asset_type",
+      required: false,
       label: "Asset Type",
       options: [
-        {value: "consumable", label: "Consumable"},
-        {value: "non_consumable", label: "Non Consumable"}
-      ]
+        { value: "consumable", label: "Consumable" },
+        { value: "non_consumable", label: "Non Consumable" },
+      ],
     },
     { type: "date", id: "entry_date", required: false, label: "Entry Date" },
     // { type: "number", id: "unit_price", required: false, label: "Unit Price", min: 0, },
@@ -50,7 +52,15 @@ export const AddAsset = () => {
       required: true,
       label: "Purchase Order No",
     },
-    { type: "number", id: "financial_year", required: true, label: "Financial Year" },
+    {
+      type: "number",
+      id: "financial_year",
+      required: true,
+      step: "1",
+      min: 2000,
+      currentYear: year,
+      label: "Financial Year",
+    },
     {
       type: "select",
       id: "asset_state",
@@ -64,7 +74,6 @@ export const AddAsset = () => {
     },
     { type: "image", id: "picture", required: false, label: "Picture" },
     { type: "image", id: "barcode", required: false, label: "Barcode" },
-
   ];
   const apiLink = "http://localhost:8000/add-asset";
   return (
@@ -74,8 +83,8 @@ export const AddAsset = () => {
         apiLink={apiLink}
         method={"POST"}
         submitName={"Add Asset"}
-        headers = {{
-          "Content-Type": "multipart/form-data"
+        headers={{
+          "Content-Type": "multipart/form-data",
         }}
       />
     </>
@@ -101,6 +110,8 @@ export const DeleteAsset = () => {
 };
 
 export const UpdateAsset = () => {
+  const date = new Date();
+  const year = date.getFullYear();
   const fields = [
     { type: "text", id: "serial_no", required: true, label: "Serial No" },
     { type: "text", id: "asset_name", required: false, label: "Asset Name" },
@@ -124,16 +135,16 @@ export const UpdateAsset = () => {
       required: false,
       label: "Asset Holder",
     },
-    { 
+    {
       type: "select",
-      id: "asset_type", 
-      required: false, 
+      id: "asset_type",
+      required: false,
       label: "Asset Type",
       options: [
-        {value: "", label: "Select"},
-        {value: "consumable", label: "Consumable"},
-        {value: "non_consumable", label: "Non Consumable"}
-      ]
+        { value: "", label: "Select" },
+        { value: "consumable", label: "Consumable" },
+        { value: "non_consumable", label: "Non Consumable" },
+      ],
     },
     { type: "date", id: "entry_date", required: false, label: "Entry Date" },
     // { type: "number", id: "unit_price", required: false, label: "Unit Price" },
@@ -144,7 +155,7 @@ export const UpdateAsset = () => {
       required: false,
       label: "Hardware",
       options: [
-        {value: "", label: "Select"},
+        { value: "", label: "Select" },
         { value: "false", label: "No" },
         { value: "true", label: "Yes" },
       ],
@@ -156,14 +167,22 @@ export const UpdateAsset = () => {
       required: false,
       label: "Purchase Order No",
     },
-    { type: "number", id: "financial_year", required: false, label: "Financial Year" },
+    {
+      type: "number",
+      id: "financial_year",
+      required: false,
+      step: "1",
+      min: 2000,
+      currentYear: year,
+      label: "Financial Year",
+    },
     {
       type: "select",
       id: "asset_state",
       required: false,
       label: "Asset State",
       options: [
-        {value: "", label: "Select"},
+        { value: "", label: "Select" },
         { value: "in_use", label: "In Use" },
         { value: "in_store", label: "In Store" },
         { value: "sold", label: "Sold" },
@@ -181,17 +200,15 @@ export const UpdateAsset = () => {
         apiLink={apiLink}
         method={"PUT"}
         submitName={"Update Asset"}
-        headers = {{
-          "Content-Type": "multipart/form-data"
+        headers={{
+          "Content-Type": "multipart/form-data",
         }}
       />
     </>
   );
 };
 
-export const AllAssets = () => {
-
-}
+export const AllAssets = () => {};
 // export const AddAsset = () => {
 //   const baseURL = process.env.REACT_APP_API_BASEURL;
 //   console.log(baseURL);

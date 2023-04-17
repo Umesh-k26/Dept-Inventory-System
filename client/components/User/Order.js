@@ -36,7 +36,14 @@ export const AddOrder = () => {
       required: false,
       label: "Invoice Date",
     },
-    { type: "number", id: "total_price", required: false, label: "Total Price" },
+    {
+      type: "number",
+      id: "total_price",
+      required: false,
+      step: "0.01",
+      min: 0,
+      label: "Total Price",
+    },
     {
       type: "select",
       id: "source_of_fund",
@@ -46,11 +53,20 @@ export const AddOrder = () => {
         { value: "project", label: "Project" },
         { value: "institute", label: "Institute" },
         { value: "both", label: "Both" },
-
       ],
     },
-    { type: "text", id: "fund_info", required: false, label: "Fund Information",},
-    { type: "text", id: "other_details", required: false, label: "Other Details",},
+    {
+      type: "text",
+      id: "fund_info",
+      required: false,
+      label: "Fund Information",
+    },
+    {
+      type: "text",
+      id: "other_details",
+      required: false,
+      label: "Other Details",
+    },
   ];
   const apiLink = "http://localhost:8000/add-order";
   return (
@@ -76,7 +92,12 @@ export const DeleteOrder = () => {
       required: true,
       label: "Purchase Order No",
     },
-    { type: "number", id: "financial_year", required: true, label: "Financial Year" },
+    {
+      type: "number",
+      id: "financial_year",
+      required: true,
+      label: "Financial Year",
+    },
   ];
   const apiLink =
     "http://localhost:8000/delete-order/${purchase_order_no}/${financial_year}";
@@ -127,7 +148,14 @@ export const UpdateOrder = () => {
       required: false,
       label: "Invoice Date",
     },
-    { type: "number", id: "total_price", required: false, label: "Total Price" },
+    {
+      type: "number",
+      id: "total_price",
+      step: "0.01",
+      min: 0,
+      required: false,
+      label: "Total Price",
+    },
     {
       type: "select",
       id: "source_of_fund",
@@ -140,8 +168,18 @@ export const UpdateOrder = () => {
         { value: "both", label: "Both" },
       ],
     },
-    { type: "text", id: "fund_info", required: false, label: "Fund Information",},
-    { type: "text", id: "other_details", required: false, label: "Other Details",},
+    {
+      type: "text",
+      id: "fund_info",
+      required: false,
+      label: "Fund Information",
+    },
+    {
+      type: "text",
+      id: "other_details",
+      required: false,
+      label: "Other Details",
+    },
   ];
   const apiLink = "http://localhost:8000/update-order";
   return (

@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import Container from "./Container";
 
 const FormField = ({ field }) => {
-  const { id, type, required, label, options } = field;
+  const { id, type, required, label, options} = field;
 
   switch (type) {
     case "text":
@@ -11,6 +11,24 @@ const FormField = ({ field }) => {
     case "url":
     case "password":
     case "number":
+      return (
+        <div>
+          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
+            {label}
+            {required && <span className="text-red-500">*</span>}
+          </label>
+          <input
+            type={type}
+            id={id}
+            name={id}
+            required={required}
+            step = {field?.step}
+            min={field?.min}
+            max={field?.currentYear}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+      );
     case "tel":
     case "date":
     case "time":
