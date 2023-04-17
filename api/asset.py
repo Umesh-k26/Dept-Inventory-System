@@ -40,15 +40,19 @@ async def add_asset(req : Request):
     pic = Binary(pic)
   else:
     pic = None
-  print(asset)
+
+  if asset['barcode'] is not None:
+    barcode = await asset['barcode'].read()
+    barcode = Binary(barcode)
+  else:
+    barcode = None
+
   try:
     asset_ = Table('asset')
-    q = Query.into('asset').insert(asset['asset_name'], asset['model'], asset['serial_no'], asset['department'], asset['asset_location'], asset['asset_holder'], asset['entry_date'], asset['unit_price'], asset['warranty'], asset['is_hardware'], asset['system_no'], asset['purchase_order_no'], asset['asset_state'], pic)
+    q = Query.into('asset').insert(asset['asset_name'], asset['model'], asset['asset_make'], asset['serial_no'], asset['department'], asset['asset_location'], asset['asset_holder'], asset['asset_type'], asset['entry_date'], asset['warranty'], asset['is_hardware'], asset['system_no'], asset['purchase_order_no'], asset['financial_year'], asset['asset_state'], pic, barcode)
     q1 = Query.from_(asset_).select(asset_.star).where(asset_.serial_no == asset['serial_no'])
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
-      #  cur.execute(q1.get_sql())
-      #  result = cur.fetchall()
     conn.commit()
 
     with conn.cursor() as cur:
@@ -89,7 +93,8 @@ async def delete_asset(serial_no : str):
 
     result_str = ''
     for i in result[0]:
-      result_str += i + " : " + str(result[0][i]) + "<br>"
+      if i != 'picture' or i != 'barcode':
+        result_str += i + " : " + str(result[0][i]) + "<br>"
 
     message = MessageSchema(
         subject="Asset Deleted",
@@ -122,14 +127,20 @@ async def update_asset(asset_ : Asset):
       set_list['asset_name'] = asset_['asset_name']
     if asset_['model']:
       set_list['model'] = asset_['model']
+    if asset_['asset_make']:
+      set_list['asset_make'] = asset_['asset_make']
+    if asset_['serial_no']:
+      set_list['serial_no'] = asset_['serial_no']
     if asset_['department']:
       set_list['department'] = asset_['department']
     if asset_['asset_location']:
       set_list['asset_location'] = asset_['asset_location']
+    if asset_['asset-holder']:
+      set_list['asset-holder'] = asset_['asset-holder']
+    if asset_['asset_type']:
+      set_list['asset_type'] = asset_['asset_type']
     if asset_['entry_date']:
       set_list['entry_date'] = asset_['entry_date']
-    if asset_['unit_price']:
-      set_list['unit_price'] = asset_['unit_price']
     if asset_['warranty']:
       set_list['warranty'] = asset_['warranty']
     if asset_['is_hardware']:
@@ -138,10 +149,14 @@ async def update_asset(asset_ : Asset):
       set_list['system_no'] = asset_['system_no']
     if asset_['purchase_order_no']:
       set_list['purchase_order_no'] = asset_['purchase_order_no']
+    if asset_['financial_year']:
+      set_list['financial_year'] = asset_['financial_year']
     if asset_['asset_state']:
       set_list['asset_state'] = asset_['asset_state']
     if asset_['picture']:
       set_list['picture'] = asset_['picture']
+    if asset_['barcode']:
+      set_list['barcode'] = asset_['barcode']
     for k in set_list.keys():
       q = q.set(k, set_list[k])
     with conn.cursor() as cur:
@@ -152,7 +167,8 @@ async def update_asset(asset_ : Asset):
 
     result_str = ''
     for i in result[0]:
-      result_str += i + " : " + str(result[0][i]) + "<br>"
+      if i != 'picture' or i != 'barcode':
+        result_str += i + " : " + str(result[0][i]) + "<br>"
 
     message = MessageSchema(
         subject="Asset Updated",

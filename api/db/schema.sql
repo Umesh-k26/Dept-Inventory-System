@@ -74,5 +74,5 @@ CREATE TABLE bulk_asset(
     picture BYTEA,
     barcode BYTEA,
     PRIMARY KEY (serial_no, asset_location),
-    FOREIGN KEY (purchase_order_no, financial_year) REFERENCES order_table (purchase_order_no, financial)
+    FOREIGN KEY (purchase_order_no, financial_year) REFERENCES order_table (purchase_order_no, financial_year)
 );
