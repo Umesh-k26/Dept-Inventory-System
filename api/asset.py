@@ -168,7 +168,7 @@ async def update_asset(asset_ : Asset):
      print(e)
      conn.rollback()
      raise HTTPException(400, "Cant update asset")
-  return Asset.parse_obj(result[0])
+  return {"message" : "Asset Updated"}
 
 
 @router_asset.post("/get-asset")

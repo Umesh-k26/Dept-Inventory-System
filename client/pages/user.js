@@ -52,7 +52,7 @@ const User = () => {
 
   return (
     <>
-      {/* <MUIDataTable data={data} columns={columns} options={options} /> */}
+      <MUIDataTable data={data} columns={columns} options={options} />
       <h1>User</h1>
 
       <div>Add Asset</div>

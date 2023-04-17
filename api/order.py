@@ -27,12 +27,12 @@ async def add_order(order : Order_Table):
   try:
     print(order)
     orders = Table('order_table')
-    q = Query.into('order_table').insert(order.purchase_order_no, order.order_date, order.indentor, order.firm_name, order.financial_year, order.gst_tin, order.final_procurement_date, order.invoice_no, order.invoice_date)
+    q = Query.into('order_table').insert(order.purchase_order_no, order.order_date, order.indentor, order.firm_name, order.financial_year, order.final_procurement_date, order.invoice_no, order.invoice_date, order.total_price, order.source_of_fund, order.fund_info, order.other_details)
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
     conn.commit()
 
-    q1 = Query.from_(orders).select(orders.star).where((orders.purchase_order_no == order.purchase_order_no) & (orders.invoice_no == order.invoice_no))
+    q1 = Query.from_(orders).select(orders.star).where((orders.purchase_order_no == order.purchase_order_no) & (orders.financial_year == order.financial_year))
     with conn.cursor() as cur:
        cur.execute(q1.get_sql())
        result = cur.fetchall()
@@ -56,14 +56,12 @@ async def add_order(order : Order_Table):
   return {"message" : "order added"}
   
 
-@router_order.delete("/delete-order/{purchase_order_no}/{invoice_no}")
-async def delete_asset(purchase_order_no : str, invoice_no : str):
+@router_order.delete("/delete-order/{purchase_order_no}/{financial_year}")
+async def delete_asset(purchase_order_no : str, financial_year : int):
   try:
     order = Table('order_table')
-    q1 = Query.from_(order).select(order.star).where(order.purchase_order_no.ilike(f'%{purchase_order_no}%') & order.invoice_no.ilike(f'%{invoice_no}%'))
-    q = Query.from_(order).delete().where(order.purchase_order_no.ilike(f'%{purchase_order_no}%') & order.invoice_no.ilike(f'%{invoice_no}%'))
-    # q = Query.from_(order).delete().where((order.purchase_order_no == purchase_order_no) & (order.invoice_no == invoice_no))
-    print(purchase_order_no, invoice_no)
+    q1 = Query.from_(order).select(order.star).where((order.purchase_order_no == purchase_order_no) & (order.financial_year == financial_year))
+    q = Query.from_(order).delete().where((order.purchase_order_no == purchase_order_no) & (order.financial_year == financial_year))
     with conn.cursor() as cur:
         cur.execute(q1.get_sql())
         result = cur.fetchall()
@@ -93,8 +91,8 @@ async def delete_asset(purchase_order_no : str, invoice_no : str):
 async def update_order(order_ : Order_Table) -> Order_Table:
   try:
     order = Table('order_table')
-    q = Query.update(order).where(order.purchase_order_no.ilike(f'{order_.purchase_order_no}') & order.invoice_no.ilike(f'{order_.invoice_no}'))
-    q1 = Query.from_(order).select(order.star).where(order.purchase_order_no.ilike(f'{order_.purchase_order_no}') & order.invoice_no.ilike(f'{order_.invoice_no}'))
+    q = Query.update(order).where(order.purchase_order_no.ilike(f'{order_.purchase_order_no}') & order.financial_year.ilike(f'{order_.financial_year}'))
+    q1 = Query.from_(order).select(order.star).where(order.purchase_order_no.ilike(f'{order_.purchase_order_no}') & order.financial_year.ilike(f'{order_.financial_year}'))
     set_list = {}
     if order_.order_date:
       set_list['order_date'] = order_.order_date
@@ -102,14 +100,20 @@ async def update_order(order_ : Order_Table) -> Order_Table:
       set_list['indentor'] = order_.indentor
     if order_.firm_name:
       set_list['firm_name'] = order_.firm_name
-    if order_.financial_year:
-      set_list['financial_year'] = order_.financial_year
-    if order_.gst_tin:
-      set_list['gst_tin'] = order_.gst_tin
     if order_.final_procurement_date:
       set_list['final_procurement_date'] = order_.final_procurement_date
+    if order_.invoice_no:
+      set_list['invoice_no'] = order_.invoice_no
     if order_.invoice_date:
       set_list['invoice_date'] = order_.invoice_date
+    if order_.total_price:
+      set_list['total_price'] = order_.total_price
+    if order_.source_of_fund:
+      set_list['source_of_fund'] = order_.source_of_fund
+    if order_.fund_info:
+      set_list['fund_info'] = order_.fund_info
+    if order_.other_details:
+      set_list['other_details'] = order_.other_details    
     for k in set_list.keys():
       q = q.set(k, set_list[k])
     with conn.cursor() as cur:
