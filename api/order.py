@@ -91,8 +91,8 @@ async def delete_asset(purchase_order_no : str, financial_year : int):
 async def update_order(order_ : Order_Table) -> Order_Table:
   try:
     order = Table('order_table')
-    q = Query.update(order).where(order.purchase_order_no.ilike(f'{order_.purchase_order_no}') & order.financial_year.ilike(f'{order_.financial_year}'))
-    q1 = Query.from_(order).select(order.star).where(order.purchase_order_no.ilike(f'{order_.purchase_order_no}') & order.financial_year.ilike(f'{order_.financial_year}'))
+    q = Query.update(order).where((order.purchase_order_no == order_.purchase_order_no) & (order.financial_year == order_.financial_year))
+    q1 = Query.from_(order).select(order.star).where((order.purchase_order_no == order_.purchase_order_no) & (order.financial_year == order_.financial_year))
     set_list = {}
     if order_.order_date:
       set_list['order_date'] = order_.order_date

@@ -11,31 +11,46 @@ export const AddOrder = () => {
       required: true,
       label: "Purchase Order No",
     },
-    { type: "date", id: "orderDate", required: false, label: "Order Date" },
+    { type: "date", id: "order_date", required: false, label: "Order Date" },
     { type: "text", id: "indentor", required: true, label: "Indentor" },
     { type: "text", id: "firm_name", required: false, label: "Firm Name" },
     {
       type: "number",
       id: "financial_year",
-      required: false,
+      required: true,
       label: "Financial Year",
       min: 2000,
       currentYear: year,
     },
-    { type: "text", id: "gst_tin", required: false, label: "GST TIN" },
+    // { type: "text", id: "gst_tin", required: false, label: "GST TIN" },
     {
       type: "date",
       id: "final_procurement_date",
       required: false,
       label: "Final Procurement Date",
     },
-    { type: "text", id: "invoice_no", required: true, label: "Invoice No" },
+    { type: "text", id: "invoice_no", required: false, label: "Invoice No" },
     {
       type: "date",
       id: "invoice_date",
       required: false,
       label: "Invoice Date",
     },
+    { type: "number", id: "total_price", required: false, label: "Total Price" },
+    {
+      type: "select",
+      id: "source_of_fund",
+      required: false,
+      label: "Source Of Fund",
+      options: [
+        { value: "project", label: "Project" },
+        { value: "institute", label: "Institute" },
+        { value: "both", label: "Both" },
+
+      ],
+    },
+    { type: "text", id: "fund_info", required: false, label: "Fund Information",},
+    { type: "text", id: "other_details", required: false, label: "Other Details",},
   ];
   const apiLink = "http://localhost:8000/add-order";
   return (
@@ -61,10 +76,10 @@ export const DeleteOrder = () => {
       required: true,
       label: "Purchase Order No",
     },
-    { type: "text", id: "invoice_no", required: true, label: "Invoice No" },
+    { type: "number", id: "financial_year", required: true, label: "Financial Year" },
   ];
   const apiLink =
-    "http://localhost:8000/delete-order/${purchase_order_no}/${invoice_no}";
+    "http://localhost:8000/delete-order/${purchase_order_no}/${financial_year}";
   return (
     <>
       <Form
@@ -93,25 +108,40 @@ export const UpdateOrder = () => {
     {
       type: "number",
       id: "financial_year",
-      required: false,
+      required: true,
       label: "Financial Year",
       min: 2000,
       currentYear: year,
     },
-    { type: "text", id: "gst_tin", required: false, label: "GST TIN" },
+    // { type: "text", id: "gst_tin", required: false, label: "GST TIN" },
     {
       type: "date",
       id: "final_procurement_date",
       required: false,
       label: "Final Procurement Date",
     },
-    { type: "text", id: "invoice_no", required: true, label: "Invoice No" },
+    { type: "text", id: "invoice_no", required: false, label: "Invoice No" },
     {
       type: "date",
       id: "invoice_date",
       required: false,
       label: "Invoice Date",
     },
+    { type: "number", id: "total_price", required: false, label: "Total Price" },
+    {
+      type: "select",
+      id: "source_of_fund",
+      required: false,
+      label: "Source Of Fund",
+      options: [
+        { value: "", label: "Select" },
+        { value: "project", label: "Project" },
+        { value: "institute", label: "Institute" },
+        { value: "both", label: "Both" },
+      ],
+    },
+    { type: "text", id: "fund_info", required: false, label: "Fund Information",},
+    { type: "text", id: "other_details", required: false, label: "Other Details",},
   ];
   const apiLink = "http://localhost:8000/update-order";
   return (
