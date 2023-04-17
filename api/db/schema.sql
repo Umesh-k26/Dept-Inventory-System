@@ -16,49 +16,61 @@ CREATE TABLE users (
 );
 
 CREATE TABLE order_table(
-    purchase_order_no VARCHAR(255) NOT NULL UNIQUE,
+    purchase_order_no VARCHAR(255) NOT NULL,
     order_date DATE,
     indentor VARCHAR(255),
     firm_name TEXT,
-    financial_year SMALLINT,
+    financial_year SMALLINT NOT NULL,
     -- quantity INT,
-    gst_tin VARCHAR(255),
+    -- gst_tin VARCHAR(255),
     final_procurement_date DATE,
-    invoice_no VARCHAR(255) NOT NULL UNIQUE,
+    invoice_no VARCHAR(255),
     invoice_date DATE,
-    PRIMARY KEY (purchase_order_no, invoice_no),
+    total_price FLOAT,
+    source_of_fund VARCHAR(255),
+    fund_info TEXT,
+    other_details TEXT,
+    PRIMARY KEY (purchase_order_no, financial_year),
     FOREIGN KEY (indentor) REFERENCES users (user_id)
 );
 
 CREATE TABLE asset(
-    asset_name VARCHAR(255),
+    asset_name TEXT,
     model VARCHAR(255),
+    asset_make VARCHAR(255),
     serial_no VARCHAR(255) NOT NULL UNIQUE,
     department VARCHAR(255),
     asset_location VARCHAR(255),
     asset_holder VARCHAR(255),
+    asset_type VARCHAR(255),
     entry_date DATE,
-    unit_price FLOAT,
+    -- unit_price FLOAT,
     warranty DATE,
     is_hardware VARCHAR(255),
     system_no VARCHAR(255),
     purchase_order_no VARCHAR(255),
     asset_state VARCHAR(255),
     picture BYTEA,
+    barcode BYTEA,
     PRIMARY KEY (serial_no),
     FOREIGN KEY (asset_holder) REFERENCES users (user_id),
     FOREIGN KEY (purchase_order_no) REFERENCES order_table (purchase_order_no)
 );
 
 CREATE TABLE bulk_asset(
-    asset_name VARCHAR(255),
+    asset_name TEXT,
     model VARCHAR(255),
+    asset_make VARCHAR(255),
+    serial_no VARCHAR(255) NOT NULL,
     department VARCHAR(255),
-    asset_location VARCHAR(255),
+    asset_location VARCHAR(255) NOT NULL,
+    asset_type VARCHAR(255),
     entry_date DATE,
     quantity INT,
     purchase_order_no VARCHAR(255),
     asset_state VARCHAR(255),
     picture BYTEA,
+    barcode BYTEA,
+    PRIMARY KEY (serial_no, asset_location),
     FOREIGN KEY (purchase_order_no) REFERENCES order_table (purchase_order_no)
 );
