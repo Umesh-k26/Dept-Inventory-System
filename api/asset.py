@@ -112,16 +112,33 @@ async def delete_asset(serial_no : str):
 
 
 @router_asset.put("/update-asset/")
-async def update_asset(asset_ : Asset):
-  # changes in asset_. to asset['']
+async def update_asset(req : Request):
+  formData = await req.form()
+
+  asset_ = dict()
+  for key in formData.keys():
+    if formData.get(key) == '':
+      asset_[key] = None
+    else:
+      asset_[key] = formData.get(key)
+  
+  if asset_['picture'] is not None:
+    pic = await asset_['picture'].read()
+    pic = Binary(pic)
+  else:
+    pic = None
+
+  if asset_['barcode'] is not None:
+    barcode = await asset_['barcode'].read()
+    barcode = Binary(barcode)
+  else:
+    barcode = None
+
   try:
-    print(asset_)
     asset = Table('asset')
-    print(asset.serial_no)
     q = Query.update(asset).where(asset.serial_no == asset_['serial_no'])
-    print("h2")
     q1 = Query.from_(asset).select(asset.star).where(asset.serial_no == asset_['serial_no'])
-    print("h1")
+    
     set_list = {}
     if asset_['asset_name']:
       set_list['asset_name'] = asset_['asset_name']
@@ -135,8 +152,8 @@ async def update_asset(asset_ : Asset):
       set_list['department'] = asset_['department']
     if asset_['asset_location']:
       set_list['asset_location'] = asset_['asset_location']
-    if asset_['asset-holder']:
-      set_list['asset-holder'] = asset_['asset-holder']
+    if asset_['asset_holder']:
+      set_list['asset_holder'] = asset_['asset_holder']
     if asset_['asset_type']:
       set_list['asset_type'] = asset_['asset_type']
     if asset_['entry_date']:
@@ -153,10 +170,10 @@ async def update_asset(asset_ : Asset):
       set_list['financial_year'] = asset_['financial_year']
     if asset_['asset_state']:
       set_list['asset_state'] = asset_['asset_state']
-    if asset_['picture']:
-      set_list['picture'] = asset_['picture']
-    if asset_['barcode']:
-      set_list['barcode'] = asset_['barcode']
+    if pic != None:
+      set_list['picture'] = pic
+    if barcode != None:
+      set_list['barcode'] = barcode
     for k in set_list.keys():
       q = q.set(k, set_list[k])
     with conn.cursor() as cur:

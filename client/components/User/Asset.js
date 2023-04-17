@@ -5,6 +5,7 @@ export const AddAsset = () => {
   const fields = [
     { type: "text", id: "asset_name", required: true, label: "Asset Name" },
     { type: "text", id: "model", required: false, label: "Model" },
+    { type: "text", id: "asset_make", required: false, label: "Asset Make" },
     { type: "text", id: "serial_no", required: true, label: "Serial No" },
     {
       type: "text",
@@ -19,14 +20,18 @@ export const AddAsset = () => {
       label: "Asset Location",
     },
     { type: "text", id: "asset_holder", required: true, label: "Asset Holder" },
-    { type: "date", id: "entry_date", required: false, label: "Entry Date" },
-    {
-      type: "number",
-      id: "unit_price",
-      required: false,
-      label: "Unit Price",
-      min: 0,
+    { 
+      type: "select",
+      id: "asset_type", 
+      required: false, 
+      label: "Asset Type",
+      options: [
+        {value: "consumable", label: "Consumable"},
+        {value: "non_consumable", label: "Non Consumable"}
+      ]
     },
+    { type: "date", id: "entry_date", required: false, label: "Entry Date" },
+    // { type: "number", id: "unit_price", required: false, label: "Unit Price", min: 0, },
     { type: "date", id: "warranty", required: false, label: "Warranty" },
     {
       type: "select",
@@ -45,6 +50,7 @@ export const AddAsset = () => {
       required: true,
       label: "Purchase Order No",
     },
+    { type: "number", id: "financial_year", required: true, label: "Financial Year" },
     {
       type: "select",
       id: "asset_state",
@@ -57,6 +63,8 @@ export const AddAsset = () => {
       ],
     },
     { type: "image", id: "picture", required: false, label: "Picture" },
+    { type: "image", id: "barcode", required: false, label: "Barcode" },
+
   ];
   const apiLink = "http://localhost:8000/add-asset";
   return (
@@ -97,6 +105,7 @@ export const UpdateAsset = () => {
     { type: "text", id: "serial_no", required: true, label: "Serial No" },
     { type: "text", id: "asset_name", required: false, label: "Asset Name" },
     { type: "text", id: "model", required: false, label: "Model" },
+    { type: "text", id: "asset_make", required: false, label: "Asset Make" },
     {
       type: "text",
       id: "department",
@@ -115,8 +124,19 @@ export const UpdateAsset = () => {
       required: false,
       label: "Asset Holder",
     },
+    { 
+      type: "select",
+      id: "asset_type", 
+      required: false, 
+      label: "Asset Type",
+      options: [
+        {value: "", label: "Select"},
+        {value: "consumable", label: "Consumable"},
+        {value: "non_consumable", label: "Non Consumable"}
+      ]
+    },
     { type: "date", id: "entry_date", required: false, label: "Entry Date" },
-    { type: "number", id: "unit_price", required: false, label: "Unit Price" },
+    // { type: "number", id: "unit_price", required: false, label: "Unit Price" },
     { type: "date", id: "warranty", required: false, label: "Warranty" },
     {
       type: "select",
@@ -124,6 +144,7 @@ export const UpdateAsset = () => {
       required: false,
       label: "Hardware",
       options: [
+        {value: "", label: "Select"},
         { value: "false", label: "No" },
         { value: "true", label: "Yes" },
       ],
@@ -135,18 +156,21 @@ export const UpdateAsset = () => {
       required: false,
       label: "Purchase Order No",
     },
+    { type: "number", id: "financial_year", required: false, label: "Financial Year" },
     {
       type: "select",
       id: "asset_state",
       required: false,
       label: "Asset State",
       options: [
+        {value: "", label: "Select"},
         { value: "in_use", label: "In Use" },
         { value: "in_store", label: "In Store" },
         { value: "sold", label: "Sold" },
       ],
     },
-    { type: "text", id: "picture", required: false, label: "Picture" },
+    { type: "image", id: "picture", required: false, label: "Picture" },
+    { type: "image", id: "barcode", required: false, label: "Barcode" },
   ];
 
   const apiLink = "http://localhost:8000/update-asset";
@@ -157,6 +181,9 @@ export const UpdateAsset = () => {
         apiLink={apiLink}
         method={"PUT"}
         submitName={"Update Asset"}
+        headers = {{
+          "Content-Type": "multipart/form-data"
+        }}
       />
     </>
   );
