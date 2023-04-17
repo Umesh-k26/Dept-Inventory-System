@@ -45,9 +45,9 @@ export const AddOrder = () => {
         apiLink={apiLink}
         method={"POST"}
         submitName={"Add Order"}
-        headers={{
-          "Content-Type": "application/json",
-        }}
+        // headers={{
+        //   "Content-Type": "application/json",
+        // }}
       />
     </>
   );
@@ -64,7 +64,7 @@ export const DeleteOrder = () => {
     { type: "text", id: "invoice_no", required: true, label: "Invoice No" },
   ];
   const apiLink =
-    "http://localhost:8000/delete-order/${purchase_order_no}${invoice_no}";
+    "http://localhost:8000/delete-order/${purchase_order_no}/${invoice_no}";
   return (
     <>
       <Form

@@ -118,30 +118,30 @@ async def update_asset(asset_ : Asset):
     q1 = Query.from_(asset).select(asset.star).where(asset.serial_no == asset_['serial_no'])
     print("h1")
     set_list = {}
-    if asset_.asset_name:
-      set_list['asset_name'] = asset_.asset_name
-    if asset_.model:
-      set_list['model'] = asset_.model
-    if asset_.department:
-      set_list['department'] = asset_.department
-    if asset_.asset_location:
-      set_list['asset_location'] = asset_.asset_location
-    if asset_.entry_date:
-      set_list['entry_date'] = asset_.entry_date
-    if asset_.unit_price:
-      set_list['unit_price'] = asset_.unit_price
-    if asset_.warranty:
-      set_list['warranty'] = asset_.warranty
-    if asset_.is_hardware:
-      set_list['is_hardware'] = asset_.is_hardware
-    if asset_.system_no:
-      set_list['system_no'] = asset_.system_no
-    if asset_.purchase_order_no:
-      set_list['purchase_order_no'] = asset_.purchase_order_no
-    if asset_.asset_state:
-      set_list['asset_state'] = asset_.asset_state
-    if asset_.picture:
-      set_list['picture'] = asset_.picture
+    if asset_['asset_name']:
+      set_list['asset_name'] = asset_['asset_name']
+    if asset_['model']:
+      set_list['model'] = asset_['model']
+    if asset_['department']:
+      set_list['department'] = asset_['department']
+    if asset_['asset_location']:
+      set_list['asset_location'] = asset_['asset_location']
+    if asset_['entry_date']:
+      set_list['entry_date'] = asset_['entry_date']
+    if asset_['unit_price']:
+      set_list['unit_price'] = asset_['unit_price']
+    if asset_['warranty']:
+      set_list['warranty'] = asset_['warranty']
+    if asset_['is_hardware']:
+      set_list['is_hardware'] = asset_['is_hardware']
+    if asset_['system_no']:
+      set_list['system_no'] = asset_['system_no']
+    if asset_['purchase_order_no']:
+      set_list['purchase_order_no'] = asset_['purchase_order_no']
+    if asset_['asset_state']:
+      set_list['asset_state'] = asset_['asset_state']
+    if asset_['picture']:
+      set_list['picture'] = asset_['picture']
     for k in set_list.keys():
       q = q.set(k, set_list[k])
     with conn.cursor() as cur:

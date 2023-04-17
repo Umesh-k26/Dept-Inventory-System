@@ -9,7 +9,7 @@ from db.connect import conn
 from models.db import User
 from fastapi import APIRouter
 
-from models.email import email, conf 
+from models.email import email, conf
 from fastapi_mail import  FastMail, MessageSchema, MessageType
 
 router_user = APIRouter()
@@ -21,13 +21,33 @@ origins = [
 # USER details
 
 @router_user.post("/add-user")
-async def add_user(user : User, email: Annotated[str, Depends(get_email)]):
+async def add_user(user : User, email_: Annotated[str, Depends(get_email)]):
   try:
     users = Table('users')
     q = Query.into(users).insert(user.user_id, user.first_name, user.last_name, user.email, user.user_type, user.department).on_conflict(users.user_id).do_update(users.user_state, 'Active')
+    q1 = Query.from_(users).select(users.star).where(users.user_id == user.user_id)
+
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
     conn.commit()
+
+    with conn.cursor() as cur:
+       cur.execute(q1.get_sql())
+       result = cur.fetchall()
+
+    result_str = ''
+    for i in result[0]:
+      result_str += i + " : " + str(result[0][i]) + "<br>"
+
+    message = MessageSchema(
+        subject="User Added",
+        recipients=email.dict().get("email"),
+        body="Dear Admin,<br> The user with the following details has been added. <br>" + result_str,
+        subtype=MessageType.html)
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+
   except Exception as e:
      print(e)
      conn.rollback()
@@ -40,7 +60,7 @@ async def add_user(user : User, email: Annotated[str, Depends(get_email)]):
 async def delete_user(user_id: str):
   try:
     users = Table('users')
-    q1 = Query.select(users).where(users.user_id.ilike(f'{user_id}'))
+    q1 = Query.from_(users).select(users.star).where(users.user_id == user_id)
     q = Query.update(users).where(users.user_id.ilike(f'{user_id}')).set(users.user_state, 'Inactive')
     with conn.cursor() as cur:
         cur.execute(q.get_sql())
@@ -56,7 +76,7 @@ async def delete_user(user_id: str):
     message = MessageSchema(
         subject="User Deleted",
         recipients=email.dict().get("email"),
-        body="Dear Admin,<br> The user with the following details has been deleted. <br>" + result_str,
+        body="Dear Admin,<br> The user with the following details has been deleted(Inactivated). <br>" + result_str,
         subtype=MessageType.html)
 
     fm = FastMail(conf)
@@ -68,7 +88,7 @@ async def delete_user(user_id: str):
   return {"message" : "user deleted"}
 
 @router_user.put("/update-user/")
-async def update_user(user : User, email: Annotated[str, Depends(get_email)]) -> User:
+async def update_user(user : User, email_: Annotated[str, Depends(get_email)]) -> User:
   try:
     users = Table('users')
     q = Query.update(users).where(users.user_id == user.user_id)

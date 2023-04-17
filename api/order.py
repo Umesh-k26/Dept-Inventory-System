@@ -26,26 +26,28 @@ origins = [
 async def add_order(order : Order_Table):
   try:
     print(order)
+    orders = Table('order_table')
     q = Query.into('order_table').insert(order.purchase_order_no, order.order_date, order.indentor, order.firm_name, order.financial_year, order.gst_tin, order.final_procurement_date, order.invoice_no, order.invoice_date)
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
     conn.commit()
-    # q1 = Query.from_(order).select(order.purchase_order_no, order.order_date, order.indentor, order.firm_name, order.financial_year, order.gst_tin, order.final_procurement_date, order.invoice_no, order.invoice_date)
-    # with conn.cursor() as cur:
-    #    cur.execute(q1.get_sql())
-    #    result = cur.fetchall()
-    # result_str = ''
-    # for i in result[0]:
-    #   result_str += i + " : " + str(result[0][i]) + "<br>"
 
-    # message = MessageSchema(
-    #     subject="Order Added",
-    #     recipients=email.dict().get("email"),
-    #     body="Dear Admin,<br> The order with the following details has been added. <br>" + result_str,
-    #     subtype=MessageType.html)
+    q1 = Query.from_(orders).select(orders.star).where((orders.purchase_order_no == order.purchase_order_no) & (orders.invoice_no == order.invoice_no))
+    with conn.cursor() as cur:
+       cur.execute(q1.get_sql())
+       result = cur.fetchall()
+    result_str = ''
+    for i in result[0]:
+      result_str += i + " : " + str(result[0][i]) + "<br>"
 
-    # fm = FastMail(conf)
-    # await fm.send_message(message)
+    message = MessageSchema(
+        subject="Order Added",
+        recipients=email.dict().get("email"),
+        body="Dear Admin,<br> The order with the following details has been added. <br>" + result_str,
+        subtype=MessageType.html)
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
 
   except Exception as e:
      print(e)
@@ -54,12 +56,14 @@ async def add_order(order : Order_Table):
   return {"message" : "order added"}
   
 
-@router_order.delete("/delete-order/{purchase_order_no}{invoice_no}")
+@router_order.delete("/delete-order/{purchase_order_no}/{invoice_no}")
 async def delete_asset(purchase_order_no : str, invoice_no : str):
   try:
     order = Table('order_table')
-    q1 = Query.from_(order).select(order.purchase_order_no, order.invoice_no)
+    q1 = Query.from_(order).select(order.star).where(order.purchase_order_no.ilike(f'%{purchase_order_no}%') & order.invoice_no.ilike(f'%{invoice_no}%'))
     q = Query.from_(order).delete().where(order.purchase_order_no.ilike(f'%{purchase_order_no}%') & order.invoice_no.ilike(f'%{invoice_no}%'))
+    # q = Query.from_(order).delete().where((order.purchase_order_no == purchase_order_no) & (order.invoice_no == invoice_no))
+    print(purchase_order_no, invoice_no)
     with conn.cursor() as cur:
         cur.execute(q1.get_sql())
         result = cur.fetchall()

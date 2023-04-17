@@ -6,7 +6,7 @@ from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 conf = ConnectionConfig(
     MAIL_USERNAME ="cs20btech11015@iith.ac.in",
     MAIL_PASSWORD = "dofsrmwuzukfxure",
-    MAIL_FROM = "test@email.com",
+    MAIL_FROM = "cs20btech11015@iith.ac.in",
     MAIL_PORT = 465,
     MAIL_SERVER = "smtp.gmail.com",
     MAIL_STARTTLS = False,
