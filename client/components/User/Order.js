@@ -1,5 +1,6 @@
 import React, { useContext, useRef } from "react";
 import Form from "components/Form";
+import DataTable from "components/Table"
 
 export const AddOrder = () => {
   const date = new Date();
@@ -193,6 +194,20 @@ export const UpdateOrder = () => {
     </>
   );
 };
+
+export const DisplayOrders = () => {
+  const apiLink = "http://localhost:8000/get-all-order";
+
+  return (
+    <>
+    <DataTable
+      apiLink={apiLink}
+      method={"GET"}
+      tableName={"All Orders"}
+    />
+    </>
+  )
+}
 
 // export const AddOrder = () => {
 //   const baseURL = process.env.REACT_APP_API_BASEURL;

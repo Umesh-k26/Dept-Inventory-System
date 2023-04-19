@@ -270,3 +270,25 @@ def filter_asset(asset_ : Asset) -> list[AssetDetails]:
     raise HTTPException(201, "filters not found")
 
   return [AssetDetails.parse_obj(asset) for asset in asset_details]
+
+@router_asset.get("/get-all-asset")
+async def get_all_asset():
+  asset = Table("asset")
+  q = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_make, asset.department, asset.asset_location, asset.asset_holder, asset.asset_type, asset.entry_date, asset.warranty, asset.is_hardware, asset.system_no, asset.purchase_order_no, asset.financial_year, asset.asset_state)
+  with conn.cursor() as cur:
+        cur.execute(q.get_sql())
+        results = cur.fetchall()
+  list_ = []
+  print(results)
+  data = []
+  columns = ["serial_no", "asset_name", "model", "asset_make", "department", "asset_location", "asset_holder", "asset_type", "entry_date", "warranty", "is_hardware", "system_no", "purchase_order_no", "financial_year", "asset_state"]
+  for i in results:
+      for j in i:
+        print(i[j])
+        list_.append(str(i[j]))
+        print(list_)
+      data.append(list_.copy())
+      list_.clear()
+  # columns.append(data.copy())
+  print(columns)
+  return {"column_name" : columns, "values" : data}

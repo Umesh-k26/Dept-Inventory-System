@@ -1,5 +1,7 @@
 import React, { useContext, useRef } from "react";
 import Form from "components/Form";
+import DataTable from "components/Table"
+import { apiBaseUrl } from "next-auth/client/_utils";
 
 export const AddUser = () => {
   const fields = [
@@ -102,3 +104,17 @@ export const GetUsers = () => {
     </>
   );
 };
+
+export const DisplayUsers = () => {
+  const apiLink = "http://localhost:8000/get-all-user";
+
+  return (
+    <>
+    <DataTable
+      apiLink={apiLink}
+      method={"GET"}
+      tableName={"All Users"}
+    />
+    </>
+  )
+}

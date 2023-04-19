@@ -1,9 +1,8 @@
 import React from "react";
-import { AddUser, DeleteUser, UpdateUser } from "components/Admin/User";
-import { AddAsset, DeleteAsset, UpdateAsset } from "components/User/Asset";
-import { AddOrder, DeleteOrder, UpdateOrder } from "components/User/Order";
+import { AddUser, DeleteUser, UpdateUser, DisplayUsers } from "components/Admin/User";
+import { AddAsset, DeleteAsset, UpdateAsset, DisplayAssets } from "components/User/Asset";
+import { AddOrder, DeleteOrder, UpdateOrder, DisplayOrders } from "components/User/Order";
 import AdminNav from "components/Admin/AdminNav";
-import DataTable from "components/Table";
 import { getSession } from "next-auth/react";
 import { useState } from "react";
 
@@ -31,12 +30,15 @@ const Admin = ({ session }) => {
       {selectedOption === 1 && <AddUser />}
       {selectedOption === 2 && <UpdateUser />}
       {selectedOption === 3 && <DeleteUser />}
+      {selectedOption === 4 && <DisplayUsers />}
       {selectedOption === 11 && <AddAsset />}
       {selectedOption === 22 && <UpdateAsset />}
       {selectedOption === 33 && <DeleteAsset />}
+      {selectedOption === 44 && <DisplayAssets />}
       {selectedOption === 111 && <AddOrder />}
       {selectedOption === 222 && <UpdateOrder />}
       {selectedOption === 333 && <DeleteOrder />}
+      {selectedOption === 444 && <DisplayOrders />}
     </>
   );
 };

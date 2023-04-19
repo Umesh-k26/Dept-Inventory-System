@@ -53,6 +53,8 @@ export const DataTable = ({ apiLink, method, tableName }) => {
               style: {
                 whiteSpace: "normal",
                 // height: "auto",
+                innerWidth: "auto",
+                outerWidth: "auto",
                 overFlowX: "hidden",
                 wordwrap: true
               },

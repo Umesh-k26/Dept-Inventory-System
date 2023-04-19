@@ -213,3 +213,21 @@ async def get_order(order_ : Order_Table) -> list[OrderDetails]:
     print(e)
     raise HTTPException(201, "Order not found")
   return [OrderDetails.parse_obj(_order) for _order in order_details]
+
+@router_order.get("/get-all-order")
+async def get_all_order():
+
+  order = Table('order_table')
+  q = Query.from_(order).select(order.star)
+  with conn.cursor() as cur:
+      cur.execute(q.get_sql())
+      results = cur.fetchall()
+  list_ = []
+  data = []
+  column = ['purchase_order_no', 'order_date', 'indentor', 'firm_name', 'financial_year', 'final_procurement_date', 'invoice_no', 'invoice_date', 'total_price', 'source_of_fund', 'fund_info', 'other_details']
+  for i in results:
+      for j in i:
+        list_.append(str(i[j]))
+      data.append(list_.copy())
+      list_.clear()
+  return {"column_name" : column, "values" : data}

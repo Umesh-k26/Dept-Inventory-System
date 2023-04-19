@@ -17,6 +17,10 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
         id: 3,
         name: "Delete User",
       },
+      {
+        id: 4,
+        name: "Display Users"
+      },
     ],
     asset: [
       {
@@ -31,6 +35,11 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
         id: 33,
         name: "Delete Asset",
       },
+      {
+        id: 44,
+        name: "Display Assets"
+      },
+
     ],
     order: [
       {
@@ -44,6 +53,10 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
       {
         id: 333,
         name: "Delete Order",
+      },
+      {
+        id: 444,
+        name: "Display Orders"
       },
     ],
   };

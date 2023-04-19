@@ -221,8 +221,11 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
       });
       const data = await res.json();
       console.log(data);
+      alert(data.message);
+      formRef.current.reset();
     } catch (err) {
       console.error(err);
+      alert(err.message);
     }
   };
 
@@ -248,6 +251,10 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
           </button>
         </div>
       </form>
+      {/* <div id="message" 
+          style="display:none">
+          Successful!
+      </div> */}
     </Container>
   );
 };
