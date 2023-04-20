@@ -12,6 +12,7 @@ import cgi
 from user import router_user
 from asset import router_asset
 from order import router_order
+from bulk_asset import router_bulk_asset
 
 app = FastAPI()
 
@@ -52,6 +53,9 @@ app.include_router(router_user)
 #Asset Details
 
 app.include_router(router_asset)
+
+#Bulk Asset Details
+app.include_router(router_bulk_asset)
 
 #Order Details
 

@@ -41,21 +41,40 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
       },
 
     ],
-    order: [
+    bulkAsset: [
       {
         id: 111,
-        name: "Add Order",
+        name: "Add Bulk Asset",
       },
       {
         id: 222,
-        name: "Update Order",
+        name: "Update Bulk Asset",
       },
       {
         id: 333,
-        name: "Delete Order",
+        name: "Delete Bulk Asset",
       },
       {
         id: 444,
+        name: "Display Bulk Assets"
+      },
+
+    ],
+    order: [
+      {
+        id: 1111,
+        name: "Add Order",
+      },
+      {
+        id: 2222,
+        name: "Update Order",
+      },
+      {
+        id: 3333,
+        name: "Delete Order",
+      },
+      {
+        id: 4444,
         name: "Display Orders"
       },
     ],
@@ -75,6 +94,12 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
           selectedOption={selectedOption}
           options={options.asset}
           displayName={"Asset"}
+        />
+        <DropDown
+          handleOptionClick={handleOptionClick}
+          selectedOption={selectedOption}
+          options={options.bulkAsset}
+          displayName={"Bulk Asset"}
         />
         <DropDown
           handleOptionClick={handleOptionClick}

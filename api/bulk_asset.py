@@ -43,7 +43,7 @@ async def add_bulk_asset(req : Request):
 
   try:
     asset_ = Table('bulk_asset')
-    q = Query.into('asset').insert(asset['asset_name'], asset['model'], asset['asset_make'], asset['serial_no'], asset['department'], asset['asset_location'], asset['asset_type'], asset['entry_date'], asset['quantity'], asset['purchase_order_no'], asset['financial_year'], asset['asset_state'], pic)
+    q = Query.into('bulk_asset').insert(asset['asset_name'], asset['model'], asset['asset_make'], asset['serial_no'], asset['department'], asset['asset_location'], asset['asset_type'], asset['entry_date'], asset['quantity'], asset['purchase_order_no'], asset['financial_year'], asset['asset_state'], pic)
     q1 = Query.from_(asset_).select(asset_.star).where(asset_.serial_no == asset['serial_no'])
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
@@ -74,12 +74,12 @@ async def add_bulk_asset(req : Request):
   return {"message" : "asset added"}
   
 
-@router_bulk_asset.delete("/delete-bulk-asset/{serial_no}")
-async def delete_bulk_asset(serial_no : str):
+@router_bulk_asset.delete("/delete-bulk-asset/{serial_no}/{asset_location}")
+async def delete_bulk_asset(serial_no : str, asset_location : str):
   try:
     asset = Table('bulk_asset')
-    q1 = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_location).where(asset.serial_no == serial_no)
-    q = Query.from_(asset).delete().where(asset.serial_no.ilike(f'{serial_no}'))
+    q1 = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_location).where(asset.serial_no == serial_no and asset.asset_location == asset_location)
+    q = Query.from_(asset).delete().where(asset.serial_no == serial_no and asset.asset_location == asset_location)
     with conn.cursor() as cur:
         cur.execute(q1.get_sql()) 
         result = cur.fetchall()
@@ -124,7 +124,7 @@ async def update_bulk_asset(req : Request):
     pic = None
 
   try:
-    asset = Table('asset')
+    asset = Table('bulk_asset')
     q = Query.update(asset).where(asset.serial_no == asset_['serial_no'])
     q1 = Query.from_(asset).select(asset.star).where(asset.serial_no == asset_['serial_no'])
     

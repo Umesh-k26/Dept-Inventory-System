@@ -13,7 +13,7 @@ const DropDown = ({
   console.log(options);
   return (
     <>
-      <div className="flex flex-col w-full pb-40">
+      <div className="flex flex-col w-full pb-60">
         <div className="relative inline-block text-left mx-auto">
           <div className="mx-auto">
             <button
