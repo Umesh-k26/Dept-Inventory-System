@@ -52,7 +52,6 @@ CREATE TABLE asset(
     financial_year SMALLINT,
     asset_state VARCHAR(255),
     picture BYTEA,
-    barcode BYTEA,
     PRIMARY KEY (serial_no),
     FOREIGN KEY (asset_holder) REFERENCES users (user_id),
     FOREIGN KEY (purchase_order_no, financial_year) REFERENCES order_table (purchase_order_no, financial_year)
@@ -72,7 +71,6 @@ CREATE TABLE bulk_asset(
     financial_year SMALLINT,
     asset_state VARCHAR(255),
     picture BYTEA,
-    barcode BYTEA,
     PRIMARY KEY (serial_no, asset_location),
     FOREIGN KEY (purchase_order_no, financial_year) REFERENCES order_table (purchase_order_no, financial_year)
 );

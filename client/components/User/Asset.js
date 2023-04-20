@@ -74,7 +74,6 @@ export const AddAsset = () => {
       ],
     },
     { type: "image", id: "picture", required: false, label: "Picture" },
-    { type: "image", id: "barcode", required: false, label: "Barcode" },
   ];
   const apiLink = "http://localhost:8000/add-asset";
   return (
@@ -190,7 +189,6 @@ export const UpdateAsset = () => {
       ],
     },
     { type: "image", id: "picture", required: false, label: "Picture" },
-    { type: "image", id: "barcode", required: false, label: "Barcode" },
   ];
 
   const apiLink = "http://localhost:8000/update-asset";

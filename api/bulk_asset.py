@@ -6,7 +6,7 @@ from psycopg2 import Binary
 
 from db.connect import conn
 
-from models.db import Asset
+from models.db import Bulk_Asset
 from models.responses import AssetDetails
 
 import datetime
@@ -16,16 +16,16 @@ from fastapi_mail import FastMail, MessageSchema, MessageType
 
 from models.email import email, conf 
 
-router_asset = APIRouter()
+router_bulk_asset = APIRouter()
 
 origins = [
     "http://localhost:3000",
 ]
 
-#ASSET details
+#BULK ASSET details
 
-@router_asset.post("/add-asset")
-async def add_asset(req : Request):
+@router_bulk_asset.post("/add-bulk-asset")
+async def add_bulk_asset(req : Request):
   formData = await req.form()
 
   asset = dict()
@@ -42,8 +42,8 @@ async def add_asset(req : Request):
     pic = None
 
   try:
-    asset_ = Table('asset')
-    q = Query.into('asset').insert(asset['asset_name'], asset['model'], asset['asset_make'], asset['serial_no'], asset['department'], asset['asset_location'], asset['asset_holder'], asset['asset_type'], asset['entry_date'], asset['warranty'], asset['is_hardware'], asset['system_no'], asset['purchase_order_no'], asset['financial_year'], asset['asset_state'], pic)
+    asset_ = Table('bulk_asset')
+    q = Query.into('asset').insert(asset['asset_name'], asset['model'], asset['asset_make'], asset['serial_no'], asset['department'], asset['asset_location'], asset['asset_type'], asset['entry_date'], asset['quantity'], asset['purchase_order_no'], asset['financial_year'], asset['asset_state'], pic)
     q1 = Query.from_(asset_).select(asset_.star).where(asset_.serial_no == asset['serial_no'])
     with conn.cursor() as cur:
        cur.execute(q.get_sql())
@@ -74,11 +74,11 @@ async def add_asset(req : Request):
   return {"message" : "asset added"}
   
 
-@router_asset.delete("/delete-asset/{serial_no}")
-async def delete_asset(serial_no : str):
+@router_bulk_asset.delete("/delete-bulk-asset/{serial_no}")
+async def delete_bulk_asset(serial_no : str):
   try:
-    asset = Table('asset')
-    q1 = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_location, asset.asset_holder).where(asset.serial_no == serial_no)
+    asset = Table('bulk_asset')
+    q1 = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_location).where(asset.serial_no == serial_no)
     q = Query.from_(asset).delete().where(asset.serial_no.ilike(f'{serial_no}'))
     with conn.cursor() as cur:
         cur.execute(q1.get_sql()) 
@@ -106,8 +106,8 @@ async def delete_asset(serial_no : str):
   return {'message' : "asset deleted"}
 
 
-@router_asset.put("/update-asset/")
-async def update_asset(req : Request):
+@router_bulk_asset.put("/update-bulk-asset/")
+async def update_bulk_asset(req : Request):
   formData = await req.form()
 
   asset_ = dict()
@@ -141,18 +141,12 @@ async def update_asset(req : Request):
       set_list['department'] = asset_['department']
     if asset_['asset_location']:
       set_list['asset_location'] = asset_['asset_location']
-    if asset_['asset_holder']:
-      set_list['asset_holder'] = asset_['asset_holder']
     if asset_['asset_type']:
       set_list['asset_type'] = asset_['asset_type']
     if asset_['entry_date']:
       set_list['entry_date'] = asset_['entry_date']
-    if asset_['warranty']:
-      set_list['warranty'] = asset_['warranty']
-    if asset_['is_hardware']:
-      set_list['is_hardware'] = asset_['is_hardware']
-    if asset_['system_no']:
-      set_list['system_no'] = asset_['system_no']
+    if asset_['quantity']:
+      set_list['quantity'] = asset_['quantity']
     if asset_['purchase_order_no']:
       set_list['purchase_order_no'] = asset_['purchase_order_no']
     if asset_['financial_year']:
@@ -161,7 +155,6 @@ async def update_asset(req : Request):
       set_list['asset_state'] = asset_['asset_state']
     if pic != None:
       set_list['picture'] = pic
-
     for k in set_list.keys():
       q = q.set(k, set_list[k])
     with conn.cursor() as cur:
@@ -172,7 +165,7 @@ async def update_asset(req : Request):
 
     result_str = ''
     for i in result[0]:
-      if i != 'picture':
+      if i != 'picture' or i != 'barcode':
         result_str += i + " : " + str(result[0][i]) + "<br>"
 
     message = MessageSchema(
@@ -192,11 +185,10 @@ async def update_asset(req : Request):
   return {"message" : "Asset Updated"}
 
 
-@router_asset.post("/get-asset")
-def filter_asset(asset_ : Asset) -> list[AssetDetails]:
+@router_bulk_asset.post("/get-bulk-asset")
+def filter_asset(asset_ : Bulk_Asset) -> list[AssetDetails]:
   try:
-    user = Table('users')
-    asset = Table('asset')
+    asset = Table('bulk_asset')
     order = Table('order_table')
     
     criterion_list = []
@@ -210,16 +202,10 @@ def filter_asset(asset_ : Asset) -> list[AssetDetails]:
       criterion_list.append(asset.department.ilike(f'%{asset_.department}%'))
     if asset_.asset_location:
       criterion_list.append(asset.asset_location.ilike(f'%{asset_.asset_location}%'))
-    if asset_.asset_holder:
-      criterion_list.append(asset.asset_holder.ilike(f'%{asset_.asset_holder}%'))
     if asset_.entry_date:
       criterion_list.append(asset.entry_date.ilike(f'%{asset_.entry_date}%'))
-    if asset_.warranty:
-      criterion_list.append(asset.warranty.ilike(f'%{asset_.warranty}%'))
-    if asset_.is_hardware:
-      criterion_list.append(asset.is_hardware == asset_.is_hardware)
-    if asset_.system_no:
-      criterion_list.append(asset.system_no.ilike(f'%{asset_.system_no}%'))
+    if asset_.quantity:
+      criterion_list.append(asset.quantity.ilike(f'{asset_.quantity}'))
     if asset_.purchase_order_no:
       criterion_list.append(asset.purchase_order_no.ilike(f'%{asset_.purchase_order_no}%'))
     if asset_.financial_year:
@@ -234,24 +220,15 @@ def filter_asset(asset_ : Asset) -> list[AssetDetails]:
         cur.execute(q.get_sql())
         asset_details = cur.fetchall()
     order_list = set([i['purchase_order_no'] for i in asset_details])
-    user_list = set([i['asset_holder'] for i in asset_details])
     q1 = Query.from_(order).select(order.star).where(
       Criterion.any( order.purchase_order_no == i for i in order_list)
-      )
-    q2 = Query.from_(user).select(user.user_id, user.first_name, user.last_name).where(
-      Criterion.any( user.user_id == i for i in user_list)
       )
     with conn.cursor() as cur:
         cur.execute(q1.get_sql())
         order_details = cur.fetchall()
-        cur.execute(q2.get_sql())
-        user_details = cur.fetchall()
     for i in asset_details:
       for j in order_details:
         if i['purchase_order_no'] == j['purchase_order_no']:
-          i.update(j)
-      for j in user_details:
-        if i['asset_holder'] == j['user_id']:
           i.update(j)
   except Exception as e:
     print(e)
@@ -259,16 +236,16 @@ def filter_asset(asset_ : Asset) -> list[AssetDetails]:
 
   return [AssetDetails.parse_obj(asset) for asset in asset_details]
 
-@router_asset.get("/get-all-asset")
-async def get_all_asset():
-  asset = Table("asset")
-  q = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_make, asset.department, asset.asset_location, asset.asset_holder, asset.asset_type, asset.entry_date, asset.warranty, asset.is_hardware, asset.system_no, asset.purchase_order_no, asset.financial_year, asset.asset_state)
+@router_bulk_asset.get("/get-all-bulk-asset")
+async def get_all_bulk_asset():
+  asset = Table("bulk_asset")
+  q = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_make, asset.department, asset.asset_location, asset.asset_type, asset.entry_date, asset.quantity, asset.purchase_order_no, asset.financial_year, asset.asset_state)
   with conn.cursor() as cur:
         cur.execute(q.get_sql())
         results = cur.fetchall()
   list_ = []
   data = []
-  columns = ["serial_no", "asset_name", "model", "asset_make", "department", "asset_location", "asset_holder", "asset_type", "entry_date", "warranty", "is_hardware", "system_no", "purchase_order_no", "financial_year", "asset_state"]
+  columns = ["serial_no", "asset_name", "model", "asset_make", "department", "asset_location", "asset_type", "entry_date", "quantity", "purchase_order_no", "financial_year", "asset_state"]
   for i in results:
       for j in i:
         list_.append(str(i[j]))
