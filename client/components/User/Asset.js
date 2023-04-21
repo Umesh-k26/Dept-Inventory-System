@@ -1,6 +1,6 @@
 import React, { useContext, useRef } from "react";
-import Form from "components/Form";
-import DataTable from "components/Table"
+import { Form } from "components/Form";
+import DataTable from "components/Table";
 
 export const AddAsset = () => {
   const date = new Date();
@@ -212,14 +212,10 @@ export const DisplayAssets = () => {
 
   return (
     <>
-    <DataTable
-      apiLink={apiLink}
-      method={"GET"}
-      tableName={"All Assets"}
-    />
+      <DataTable apiLink={apiLink} method={"GET"} tableName={"All Assets"} />
     </>
-  )
-}
+  );
+};
 
 // export const AllAssets = () => {};
 // export const AddAsset = () => {

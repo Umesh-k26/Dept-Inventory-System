@@ -27,6 +27,21 @@ export default NextAuth({
     async session({ session, token }) {
       session.user.id = token.id;
       session.accessToken = token.accessToken;
+      try {
+        const res = await fetch("http://localhost:8000/get-role", {
+          headers: {
+            Authorization: session.accessToken,
+          },
+        });
+        const data = await res.json();
+        session.statuscode = res.status;
+        if (!res.ok) {
+          session.message = data.detail;
+        }
+        if (res.status != 404) session.loggedIn = true;
+      } catch (err) {
+        console.log(err);
+      }
       return session;
     },
   },

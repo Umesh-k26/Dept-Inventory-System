@@ -1,9 +1,11 @@
 import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import Container from "./Container";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 const FormField = ({ field }) => {
-  const { id, type, required, label, options} = field;
+  const { id, type, required, label, options } = field;
 
   switch (type) {
     case "text":
@@ -22,7 +24,7 @@ const FormField = ({ field }) => {
             id={id}
             name={id}
             required={required}
-            step = {field?.step}
+            step={field?.step}
             min={field?.min}
             max={field?.currentYear}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -169,16 +171,15 @@ const FormField = ({ field }) => {
   }
 };
 
-const Form = ({ fields, apiLink, method, submitName, headers }) => {
+export const Form = ({ fields, apiLink, method, submitName, headers }) => {
   const { data: session, status } = useSession();
+  const [message, setMessage] = useState();
+  const [loading, setLoading] = useState(false);
   const formRef = useRef(null);
-  // const inputRefs = fields.reduce((acc, field) => {
-  //   acc[field.id] = useRef(null);
-  //   return acc;
-  // }, {});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData(formRef.current);
     formData.forEach((value, key) => {
       if (value == "") formData[key] = null;
@@ -190,8 +191,8 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
     else formData.forEach((val, key) => (reqBody[key] = val));
 
     console.log(reqBody);
-    for (let k in reqBody){
-      if(reqBody[k] == "") reqBody[k] = null;
+    for (let k in reqBody) {
+      if (reqBody[k] == "") reqBody[k] = null;
     }
     try {
       let apiLinkWithParams = apiLink;
@@ -207,7 +208,6 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
       console.log(headers);
       let reqHeaders = {};
       if (!headers) {
-        console.log("came here line 191");
         reqBody = JSON.stringify(reqBody);
         reqHeaders = { "Content-Type": "application/json" };
       }
@@ -227,6 +227,7 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
       console.error(err);
       alert(err.message);
     }
+    setLoading(false);
   };
 
   return (
@@ -242,13 +243,20 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
         {fields.map((field) => (
           <FormField key={field.id} field={field} />
         ))}
-        <div className="pt-6">
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            {submitName}
-          </button>
+        <div className="pt-6 w-32">
+          {loading && (
+            <Box sx={{ display: "flex" }}>
+              <CircularProgress />
+            </Box>
+          )}
+          {!loading && (
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              {submitName}
+            </button>
+          )}
         </div>
       </form>
       {/* <div id="message" 
@@ -259,4 +267,7 @@ const Form = ({ fields, apiLink, method, submitName, headers }) => {
   );
 };
 
-export default Form;
+export const DeleteForm = ({ fields, apiLink, method, submitName, headers }) => {
+
+
+}

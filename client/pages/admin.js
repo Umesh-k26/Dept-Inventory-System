@@ -16,7 +16,7 @@ const Admin = ({ session }) => {
 
   const handleOptionClick = (option, callback) => {
     setSelectedOption(option);
-    console.log(selectedOption)
+    // console.log(selectedOption);
     callback();
     // setIsOpen(false);
   };
@@ -53,11 +53,23 @@ export default Admin;
 export async function getServerSideProps(context) {
   const { req } = context;
   const session = await getSession({ req });
-  if (!session) {
+  console.log(session);
+
+  if (!session || session.statuscode == 404) {
     return {
-      redirect: { destination: "/", shallow: true },
+      redirect: {
+        destination: "/",
+        shallow: true,
+      },
     };
   }
+  if (session.statuscode == 403)
+    return {
+      redirect: {
+        destination: "/user",
+        shallow: true,
+      },
+    };
   return {
     props: {
       session,

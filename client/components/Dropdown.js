@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 const DropDown = ({
   handleOptionClick,
@@ -10,7 +10,6 @@ const DropDown = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const callback = () => setIsOpen(false);
-  console.log(options);
   return (
     <>
       <div className="flex flex-col w-full pb-60">
@@ -37,9 +36,6 @@ const DropDown = ({
           >
             <div className="py-1 w-auto" role="none">
               {options?.map((option) => {
-                {
-                  console.log("line 41", option.name);
-                }
                 return (
                   <button
                     className={`${

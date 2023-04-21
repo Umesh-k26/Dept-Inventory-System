@@ -29,12 +29,15 @@ async def add_asset(req : Request):
   formData = await req.form()
 
   asset = dict()
+  # print(formData.keys())
+  # return
   for key in formData.keys():
     if formData.get(key) == '':
       asset[key] = None
     else:
       asset[key] = formData.get(key)
-  
+  print(asset)
+  # return
   if asset['picture'] is not None:
     pic = await asset['picture'].read()
     pic = Binary(pic)

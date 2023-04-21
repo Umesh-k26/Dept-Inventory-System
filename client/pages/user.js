@@ -1,4 +1,6 @@
 import React from "react";
+import { getSession } from "next-auth/react";
+import { AddUser, DeleteUser, UpdateUser } from "components/Admin/User";
 import { AddAsset, DeleteAsset, UpdateAsset } from "components/User/Asset";
 import { AddOrder, DeleteOrder, UpdateOrder } from "components/User/Order";
 import MUIDataTable from "mui-datatables";
@@ -77,3 +79,22 @@ const User = () => {
 };
 
 export default User;
+
+export async function getServerSideProps(context) {
+  const { req } = context;
+  const session = await getSession({ req });
+
+  if (!session || session.statuscode == 404) {
+    return {
+      redirect: {
+        destination: "/",
+        shallow: true,
+      },
+    };
+  }
+  return {
+    props: {
+      session,
+    },
+  };
+}

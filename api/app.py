@@ -31,9 +31,8 @@ app.add_middleware(
 
 @app.get("/get-role/")
 async def get_test(email: Annotated[str ,Depends(get_email)]):
-    # print(f"email is {email}")
-    # print(Config.GOOGLE_CLIENT_ID)
-    return {"role": "admin"}
+  print("line 33: app.py")
+  return {"email": email}
 
 @app.post("/uploadfile/")
 async def upload_file(file: UploadFile = File(...)):

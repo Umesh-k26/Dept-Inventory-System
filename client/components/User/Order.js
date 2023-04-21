@@ -1,6 +1,6 @@
 import React, { useContext, useRef } from "react";
-import Form from "components/Form";
-import DataTable from "components/Table"
+import { Form } from "components/Form";
+import DataTable from "components/Table";
 
 export const AddOrder = () => {
   const date = new Date();
@@ -77,9 +77,6 @@ export const AddOrder = () => {
         apiLink={apiLink}
         method={"POST"}
         submitName={"Add Order"}
-        // headers={{
-        //   "Content-Type": "application/json",
-        // }}
       />
     </>
   );
@@ -200,14 +197,10 @@ export const DisplayOrders = () => {
 
   return (
     <>
-    <DataTable
-      apiLink={apiLink}
-      method={"GET"}
-      tableName={"All Orders"}
-    />
+      <DataTable apiLink={apiLink} method={"GET"} tableName={"All Orders"} />
     </>
-  )
-}
+  );
+};
 
 // export const AddOrder = () => {
 //   const baseURL = process.env.REACT_APP_API_BASEURL;

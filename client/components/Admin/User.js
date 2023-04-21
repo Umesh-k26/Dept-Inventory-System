@@ -1,6 +1,6 @@
 import React, { useContext, useRef } from "react";
-import Form from "components/Form";
-import DataTable from "components/Table"
+import { Form } from "components/Form";
+import DataTable from "components/Table";
 import { apiBaseUrl } from "next-auth/client/_utils";
 
 export const AddUser = () => {
@@ -110,11 +110,7 @@ export const DisplayUsers = () => {
 
   return (
     <>
-    <DataTable
-      apiLink={apiLink}
-      method={"GET"}
-      tableName={"All Users"}
-    />
+      <DataTable apiLink={apiLink} method={"GET"} tableName={"All Users"} />
     </>
-  )
-}
+  );
+};

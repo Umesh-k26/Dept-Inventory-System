@@ -57,7 +57,7 @@ async def add_user(user : User, email_: Annotated[str, Depends(get_email)]):
   
 
 @router_user.delete("/delete-user/{user_id}")
-async def delete_user(user_id: str):
+async def delete_user(user_id: str, email_: Annotated[str, Depends(get_email)]):
   try:
     users = Table('users')
     q1 = Query.from_(users).select(users.star).where(users.user_id == user_id)
@@ -147,7 +147,7 @@ def get_user(user_id : str) -> User:
 
 
 @router_user.post("/get-user")
-def filter_user(user : User) -> list[User]:
+def filter_user(user : User, email_: Annotated[str, Depends(get_email)]) -> list[User]:
   try:
     users = Table('users')
     q = Query.from_(users).select(users.star)
