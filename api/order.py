@@ -53,7 +53,7 @@ async def add_order(order : Order_Table):
      print(e)
      conn.rollback()
      raise HTTPException(400, "Cant add order")
-  return {"message" : "order added"}
+  return {"detail" : "order added"}
   
 
 @router_order.delete("/delete-order/{purchase_order_no}/{financial_year}")
@@ -84,7 +84,7 @@ async def delete_asset(purchase_order_no : str, financial_year : int):
   except Exception as e:
     print(e)
     raise HTTPException(201, "Order not found")
-  return {"message" : "order deleted"}
+  return {"detail" : "order deleted"}
 
 
 @router_order.put("/update-order/")
@@ -139,7 +139,7 @@ async def update_order(order_ : Order_Table) -> Order_Table:
      print(e)
      conn.rollback()
      raise HTTPException(400, "Cant update order")
-  return Order_Table.parse_obj(result[0])
+  return {"detail" : "Order Updated"}
 
 @router_order.post("/get-order/")
 async def get_order(order_ : Order_Table) -> list[OrderDetails]:

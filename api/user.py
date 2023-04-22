@@ -52,7 +52,7 @@ async def add_user(user : User, email_: Annotated[str, Depends(get_email)]):
      print(e)
      conn.rollback()
      raise HTTPException(400, "Cant add user")
-  return {"message": "user added"}
+  return {"detail": "user added"}
   
   
 
@@ -85,10 +85,10 @@ async def delete_user(user_id: str, email_: Annotated[str, Depends(get_email)]):
   except Exception as e:
     print(e)
     raise HTTPException(201, "User not found")
-  return {"message" : "user deleted"}
+  return {"detail" : "user deleted"}
 
 @router_user.put("/update-user/")
-async def update_user(user : User, email_: Annotated[str, Depends(get_email)]) -> User:
+async def update_user(user : User, email_: Annotated[str, Depends(get_email)]):
   try:
     users = Table('users')
     q = Query.update(users).where(users.user_id == user.user_id)
@@ -129,7 +129,7 @@ async def update_user(user : User, email_: Annotated[str, Depends(get_email)]) -
      print(e)
      conn.rollback()
      raise HTTPException(400, "Cant update user")
-  return User.parse_obj(result[0])
+  return {"detail" : "User Updated"}
 
 
 @router_user.get("/get-user/{user_id}")

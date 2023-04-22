@@ -1,5 +1,5 @@
 import React, { useContext, useRef } from "react";
-import Form from "components/Form";
+import { Form } from "components/Form";
 import DataTable from "components/Table"
 
 export const AddBulkAsset = () => {
@@ -19,7 +19,7 @@ export const AddBulkAsset = () => {
     {
       type: "text",
       id: "asset_location",
-      required: false,
+      required: true,
       label: "Asset Location",
     },
     {
@@ -115,14 +115,8 @@ export const UpdateBulkAsset = () => {
     {
       type: "text",
       id: "asset_location",
-      required: false,
+      required: true,
       label: "Asset Location",
-    },
-    {
-      type: "text",
-      id: "asset_holder",
-      required: false,
-      label: "Asset Holder",
     },
     {
       type: "select",

@@ -3,16 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 from auth import get_email
 from configs import Config
-from pypika import PostgreSQLQuery as Query, Table, Tuple, Parameter, Criterion
 
 from db.connect import conn
-from psycopg2 import Binary
-import cgi
+import schedule
+import time
+import threading
 
 from user import router_user
 from asset import router_asset
 from order import router_order
 from bulk_asset import router_bulk_asset
+
+from warranty import warranty_
 
 app = FastAPI()
 
@@ -59,3 +61,14 @@ app.include_router(router_bulk_asset)
 #Order Details
 
 app.include_router(router_order)
+
+#scheduling the warranty
+def run_on_startup():
+    schedule.every().day.at("08:00").do(warranty_)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+@app.on_event("startup")
+def startup_event():
+    threading.Thread(target=run_on_startup, daemon=True).start()

@@ -71,7 +71,7 @@ async def add_bulk_asset(req : Request):
      print(e)
      conn.rollback()
      raise HTTPException(e)
-  return {"message" : "asset added"}
+  return {"detail" : "Asset added"}
   
 
 @router_bulk_asset.delete("/delete-bulk-asset/{serial_no}/{asset_location}")
@@ -103,7 +103,7 @@ async def delete_bulk_asset(serial_no : str, asset_location : str):
   except Exception as e:
     print(e)
     raise HTTPException(201, "Asset not found")
-  return {'message' : "asset deleted"}
+  return {'detail' : "Asset deleted"}
 
 
 @router_bulk_asset.put("/update-bulk-asset/")
@@ -182,7 +182,7 @@ async def update_bulk_asset(req : Request):
      print(e)
      conn.rollback()
      raise HTTPException(400, "Cant update asset")
-  return {"message" : "Asset Updated"}
+  return {"detail" : "Asset Updated"}
 
 
 @router_bulk_asset.post("/get-bulk-asset")

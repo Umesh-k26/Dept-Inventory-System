@@ -74,7 +74,7 @@ async def add_asset(req : Request):
      print(e)
      conn.rollback()
      raise HTTPException(e)
-  return {"message" : "asset added"}
+  return {"detail" : "asset added"}
   
 
 @router_asset.delete("/delete-asset/{serial_no}")
@@ -106,7 +106,7 @@ async def delete_asset(serial_no : str):
   except Exception as e:
     print(e)
     raise HTTPException(201, "Asset not found")
-  return {'message' : "asset deleted"}
+  return {'detail' : "asset deleted"}
 
 
 @router_asset.put("/update-asset/")
@@ -192,7 +192,7 @@ async def update_asset(req : Request):
      print(e)
      conn.rollback()
      raise HTTPException(400, "Cant update asset")
-  return {"message" : "Asset Updated"}
+  return {"detail" : "Asset Updated"}
 
 
 @router_asset.post("/get-asset")

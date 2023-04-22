@@ -66,6 +66,7 @@ export const UpdateUser = () => {
       required: false,
       label: "User Type",
       options: [
+        { value: "", label: "Select" },
         { value: "Student", label: "Student" },
         { value: "Faculty", label: "Faculty" },
         { value: "Staff", label: "Staff" },

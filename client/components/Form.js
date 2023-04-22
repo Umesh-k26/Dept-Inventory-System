@@ -221,7 +221,7 @@ export const Form = ({ fields, apiLink, method, submitName, headers }) => {
       });
       const data = await res.json();
       console.log(data);
-      alert(data.message);
+      alert(data.detail);
       formRef.current.reset();
     } catch (err) {
       console.error(err);
