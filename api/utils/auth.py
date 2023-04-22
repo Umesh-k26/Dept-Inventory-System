@@ -1,7 +1,7 @@
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from starlette.requests import Request
-from configs import Config
+from utils.configs import Config
 from db.connect import conn
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from fastapi import HTTPException
@@ -49,23 +49,3 @@ async def get_email(request: Request):
     except ValueError:
         raise HTTPException(404, detail="We are not able to authenticate you.")
     
-
-
-
-# def get_email(conn, token):
-#     try:
-#         idinfo = id_token.verify_oauth2_token(
-#             token, requests.Request(), cnf.GOOGLE_CLIENT_ID
-#         )
-#         email = idinfo["email"]
-#         try:
-#             is_admin = queries.get_admin_status_team_member(conn, email=email)[
-#                 "is_admin"
-#             ]
-#         except IndexError:
-#             is_admin = False
-#         if is_admin:
-#             return email
-#         return False
-#     except ValueError:
-#         return None

@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException
 from typing import Annotated
-from auth import get_email
-from configs import Config
+from utils.auth import get_email
+from utils.configs import Config
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 
 from db.connect import conn
@@ -12,7 +12,7 @@ from fastapi import APIRouter
 from models.email import email, conf
 from fastapi_mail import  FastMail, MessageSchema, MessageType
 
-router_user = APIRouter()
+router = APIRouter()
 
 origins = [
     "http://localhost:3000",
@@ -20,7 +20,7 @@ origins = [
 
 # USER details
 
-@router_user.post("/add-user")
+@router.post("/add-user")
 async def add_user(user : User, email_: Annotated[str, Depends(get_email)]):
   try:
     users = Table('users')
@@ -56,7 +56,7 @@ async def add_user(user : User, email_: Annotated[str, Depends(get_email)]):
   
   
 
-@router_user.delete("/delete-user/{user_id}")
+@router.delete("/delete-user/{user_id}")
 async def delete_user(user_id: str, email_: Annotated[str, Depends(get_email)]):
   try:
     users = Table('users')
@@ -87,7 +87,7 @@ async def delete_user(user_id: str, email_: Annotated[str, Depends(get_email)]):
     raise HTTPException(201, "User not found")
   return {"detail" : "user deleted"}
 
-@router_user.put("/update-user/")
+@router.put("/update-user/")
 async def update_user(user : User, email_: Annotated[str, Depends(get_email)]):
   try:
     users = Table('users')
@@ -132,7 +132,7 @@ async def update_user(user : User, email_: Annotated[str, Depends(get_email)]):
   return {"detail" : "User Updated"}
 
 
-@router_user.get("/get-user/{user_id}")
+@router.get("/get-user/{user_id}")
 def get_user(user_id : str) -> User:
   try:
     users = Table('users')
@@ -146,7 +146,7 @@ def get_user(user_id : str) -> User:
   return User.parse_obj(user[0])
 
 
-@router_user.post("/get-user")
+@router.post("/get-user")
 def filter_user(user : User, email_: Annotated[str, Depends(get_email)]) -> list[User]:
   try:
     users = Table('users')
@@ -175,7 +175,7 @@ def filter_user(user : User, email_: Annotated[str, Depends(get_email)]) -> list
     raise HTTPException(201, "filters not found")
   return [User.parse_obj(user_) for user_ in results]
 
-@router_user.get("/get-all-user")
+@router.get("/get-all-user")
 async def get_all_user():
 
     user = Table('users')

@@ -13,7 +13,7 @@ from models.responses import OrderDetails
 from models.email import email, conf 
 from fastapi_mail import  FastMail, MessageSchema, MessageType
 
-router_order = APIRouter()
+router = APIRouter()
 
 origins = [
     "http://localhost:3000",
@@ -22,7 +22,7 @@ origins = [
 
 #ORDER details
 
-@router_order.post("/add-order")
+@router.post("/add-order")
 async def add_order(order : Order_Table):
   try:
     print(order)
@@ -56,7 +56,7 @@ async def add_order(order : Order_Table):
   return {"detail" : "order added"}
   
 
-@router_order.delete("/delete-order/{purchase_order_no}/{financial_year}")
+@router.delete("/delete-order/{purchase_order_no}/{financial_year}")
 async def delete_asset(purchase_order_no : str, financial_year : int):
   try:
     order = Table('order_table')
@@ -87,7 +87,7 @@ async def delete_asset(purchase_order_no : str, financial_year : int):
   return {"detail" : "order deleted"}
 
 
-@router_order.put("/update-order/")
+@router.put("/update-order/")
 async def update_order(order_ : Order_Table) -> Order_Table:
   try:
     order = Table('order_table')
@@ -141,7 +141,7 @@ async def update_order(order_ : Order_Table) -> Order_Table:
      raise HTTPException(400, "Cant update order")
   return {"detail" : "Order Updated"}
 
-@router_order.post("/get-order/")
+@router.post("/get-order/")
 async def get_order(order_ : Order_Table) -> list[OrderDetails]:
   try:
     order = Table('order_table')
@@ -214,7 +214,7 @@ async def get_order(order_ : Order_Table) -> list[OrderDetails]:
     raise HTTPException(201, "Order not found")
   return [OrderDetails.parse_obj(_order) for _order in order_details]
 
-@router_order.get("/get-all-order")
+@router.get("/get-all-order")
 async def get_all_order():
 
   order = Table('order_table')

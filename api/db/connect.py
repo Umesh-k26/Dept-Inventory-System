@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from configs import Config
+from utils.configs import Config
 
 conn = psycopg2.connect(
     dbname = Config.POSTGRES_NAME,

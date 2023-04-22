@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, UploadFile, File, Body, Request
 from typing import Annotated
-from configs import Config
+from utils.configs import Config
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from psycopg2 import Binary
 
@@ -16,7 +16,7 @@ from fastapi_mail import FastMail, MessageSchema, MessageType
 
 from models.email import email, conf 
 
-router_asset = APIRouter()
+router = APIRouter()
 
 origins = [
     "http://localhost:3000",
@@ -24,7 +24,7 @@ origins = [
 
 #ASSET details
 
-@router_asset.post("/add-asset")
+@router.post("/add-asset")
 async def add_asset(req : Request):
   formData = await req.form()
 
@@ -77,7 +77,7 @@ async def add_asset(req : Request):
   return {"detail" : "asset added"}
   
 
-@router_asset.delete("/delete-asset/{serial_no}")
+@router.delete("/delete-asset/{serial_no}")
 async def delete_asset(serial_no : str):
   try:
     asset = Table('asset')
@@ -109,7 +109,7 @@ async def delete_asset(serial_no : str):
   return {'detail' : "asset deleted"}
 
 
-@router_asset.put("/update-asset/")
+@router.put("/update-asset/")
 async def update_asset(req : Request):
   formData = await req.form()
 
@@ -195,7 +195,7 @@ async def update_asset(req : Request):
   return {"detail" : "Asset Updated"}
 
 
-@router_asset.post("/get-asset")
+@router.post("/get-asset")
 def filter_asset(asset_ : Asset) -> list[AssetDetails]:
   try:
     user = Table('users')
@@ -262,7 +262,7 @@ def filter_asset(asset_ : Asset) -> list[AssetDetails]:
 
   return [AssetDetails.parse_obj(asset) for asset in asset_details]
 
-@router_asset.get("/get-all-asset")
+@router.get("/get-all-asset")
 async def get_all_asset():
   asset = Table("asset")
   q = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_make, asset.department, asset.asset_location, asset.asset_holder, asset.asset_type, asset.entry_date, asset.warranty, asset.is_hardware, asset.system_no, asset.purchase_order_no, asset.financial_year, asset.asset_state)

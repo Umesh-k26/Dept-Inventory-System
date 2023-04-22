@@ -1,20 +1,17 @@
 from fastapi import Depends, FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
-from auth import get_email
-from configs import Config
+from utils.auth import get_email
+from utils.configs import Config
 
 from db.connect import conn
 import schedule
 import time
 import threading
 
-from user import router_user
-from asset import router_asset
-from order import router_order
-from bulk_asset import router_bulk_asset
+from routes import user, order, asset, bulk_asset
 
-from warranty import warranty_
+from utils.warranty import warranty_
 
 app = FastAPI()
 
@@ -49,18 +46,18 @@ async def upload_file(file: UploadFile = File(...)):
 
 # USER details
 
-app.include_router(router_user)
+app.include_router(user.router)
 
 #Asset Details
 
-app.include_router(router_asset)
+app.include_router(asset.router)
 
 #Bulk Asset Details
-app.include_router(router_bulk_asset)
+app.include_router(bulk_asset.router)
 
 #Order Details
 
-app.include_router(router_order)
+app.include_router(order.router)
 
 #scheduling the warranty
 def run_on_startup():

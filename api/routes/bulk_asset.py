@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, UploadFile, File, Body, Request
 from typing import Annotated
-from configs import Config
+from utils.configs import Config
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from psycopg2 import Binary
 
@@ -16,7 +16,7 @@ from fastapi_mail import FastMail, MessageSchema, MessageType
 
 from models.email import email, conf 
 
-router_bulk_asset = APIRouter()
+router = APIRouter()
 
 origins = [
     "http://localhost:3000",
@@ -24,7 +24,7 @@ origins = [
 
 #BULK ASSET details
 
-@router_bulk_asset.post("/add-bulk-asset")
+@router.post("/add-bulk-asset")
 async def add_bulk_asset(req : Request):
   formData = await req.form()
 
@@ -74,7 +74,7 @@ async def add_bulk_asset(req : Request):
   return {"detail" : "Asset added"}
   
 
-@router_bulk_asset.delete("/delete-bulk-asset/{serial_no}/{asset_location}")
+@router.delete("/delete-bulk-asset/{serial_no}/{asset_location}")
 async def delete_bulk_asset(serial_no : str, asset_location : str):
   try:
     asset = Table('bulk_asset')
@@ -106,7 +106,7 @@ async def delete_bulk_asset(serial_no : str, asset_location : str):
   return {'detail' : "Asset deleted"}
 
 
-@router_bulk_asset.put("/update-bulk-asset/")
+@router.put("/update-bulk-asset/")
 async def update_bulk_asset(req : Request):
   formData = await req.form()
 
@@ -185,7 +185,7 @@ async def update_bulk_asset(req : Request):
   return {"detail" : "Asset Updated"}
 
 
-@router_bulk_asset.post("/get-bulk-asset")
+@router.post("/get-bulk-asset")
 def filter_asset(asset_ : Bulk_Asset) -> list[AssetDetails]:
   try:
     asset = Table('bulk_asset')
@@ -236,7 +236,7 @@ def filter_asset(asset_ : Bulk_Asset) -> list[AssetDetails]:
 
   return [AssetDetails.parse_obj(asset) for asset in asset_details]
 
-@router_bulk_asset.get("/get-all-bulk-asset")
+@router.get("/get-all-bulk-asset")
 async def get_all_bulk_asset():
   asset = Table("bulk_asset")
   q = Query.from_(asset).select(asset.serial_no, asset.asset_name, asset.model, asset.asset_make, asset.department, asset.asset_location, asset.asset_type, asset.entry_date, asset.quantity, asset.purchase_order_no, asset.financial_year, asset.asset_state)
