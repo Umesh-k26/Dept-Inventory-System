@@ -44,14 +44,14 @@ export async function getServerSideProps(context) {
   const { req } = context;
   const session = await getSession({ req });
   console.log(session);
-  if (session) {
-    if (session.statuscode == 200)
+  if (session?.ok) {
+    if (session.isAdmin)
       return {
         redirect: {
           destination: "/admin",
         },
       };
-    else if (session.statuscode != 404)
+    else
       return {
         redirect: {
           destination: "/user",
@@ -61,7 +61,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       providers,
-      message: session?.message ? session.message : null
+      message: session?.message ? session.message : null,
     },
   };
 }

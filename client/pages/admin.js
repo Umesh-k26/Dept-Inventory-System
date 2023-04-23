@@ -1,8 +1,28 @@
 import React from "react";
-import { AddUser, DeleteUser, UpdateUser, DisplayUsers } from "components/Admin/User";
-import { AddAsset, DeleteAsset, UpdateAsset, DisplayAssets } from "components/User/Asset";
-import { AddBulkAsset, DeleteBulkAsset, UpdateBulkAsset, DisplayBulkAssets } from "components/User/BulkAsset";
-import { AddOrder, DeleteOrder, UpdateOrder, DisplayOrders } from "components/User/Order";
+import {
+  AddUser,
+  DeleteUser,
+  UpdateUser,
+  DisplayUsers,
+} from "components/Admin/User";
+import {
+  AddAsset,
+  DeleteAsset,
+  UpdateAsset,
+  DisplayAssets,
+} from "components/User/Asset";
+import {
+  AddBulkAsset,
+  DeleteBulkAsset,
+  UpdateBulkAsset,
+  DisplayBulkAssets,
+} from "components/User/BulkAsset";
+import {
+  AddOrder,
+  DeleteOrder,
+  UpdateOrder,
+  DisplayOrders,
+} from "components/User/Order";
 import AdminNav from "components/Admin/AdminNav";
 import { getSession } from "next-auth/react";
 import { useState } from "react";
@@ -55,7 +75,7 @@ export async function getServerSideProps(context) {
   const session = await getSession({ req });
   console.log(session);
 
-  if (!session || session.statuscode == 404) {
+  if (!session?.ok) {
     return {
       redirect: {
         destination: "/",
@@ -63,7 +83,7 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  if (session.statuscode == 403)
+  if (!session.isAdmin)
     return {
       redirect: {
         destination: "/user",

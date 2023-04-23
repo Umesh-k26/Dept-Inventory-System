@@ -34,11 +34,12 @@ export default NextAuth({
           },
         });
         const data = await res.json();
-        session.statuscode = res.status;
+        session.ok = res.status;
         if (!res.ok) {
           session.message = data.detail;
+        } else {
+          session.isAdmin = data.user_type == "Admin";
         }
-        if (res.status != 404) session.loggedIn = true;
       } catch (err) {
         console.log(err);
       }

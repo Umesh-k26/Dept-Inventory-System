@@ -3,15 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 from utils.auth import get_email
 from utils.configs import Config
-
-from db.connect import conn
+import psycopg2
+from psycopg2.extras import RealDictCursor
 import schedule
 import time
 import threading
-
 from routes import user, order, asset, bulk_asset
-
 from utils.warranty import warranty_
+from db.connect import conn
 
 app = FastAPI()
 
@@ -28,10 +27,25 @@ app.add_middleware(
 )
 
 
+# scheduling the warranty
+def run_on_startup():
+    schedule.every().day.at("08:00").do(warranty_)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+@app.on_event("startup")
+def startup_event():
+    threading.Thread(target=run_on_startup, daemon=True).start()
+    print("on start event")
+
+
 @app.get("/get-role/")
-async def get_test(email: Annotated[str ,Depends(get_email)]):
-  print("line 33: app.py")
-  return {"email": email}
+async def get_test(details: Annotated[dict, Depends(get_email)]):
+    print(details)
+    return details
+
 
 @app.post("/uploadfile/")
 async def upload_file(file: UploadFile = File(...)):
@@ -45,27 +59,13 @@ async def upload_file(file: UploadFile = File(...)):
 
 
 # USER details
-
 app.include_router(user.router)
 
-#Asset Details
-
+# Asset Details
 app.include_router(asset.router)
 
-#Bulk Asset Details
+# Bulk Asset Details
 app.include_router(bulk_asset.router)
 
-#Order Details
-
+# Order Details
 app.include_router(order.router)
-
-#scheduling the warranty
-def run_on_startup():
-    schedule.every().day.at("08:00").do(warranty_)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-@app.on_event("startup")
-def startup_event():
-    threading.Thread(target=run_on_startup, daemon=True).start()

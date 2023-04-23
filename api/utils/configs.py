@@ -12,7 +12,8 @@ class AppConfigError(Exception):
 
 
 def _parse_bool(val: Union[str, bool]) -> bool:  # pylint: disable=E1136
-    return val if type(val) == bool else val.lower() in ['true', 'yes', '1']
+    return val if type(val) == bool else val.lower() in ["true", "yes", "1"]
+
 
 # AppConfig class with required fields, default values, type checking, and typecasting for int and bool values
 
@@ -24,7 +25,7 @@ class AppConfig:
     POSTGRES_PASS: str
     POSTGRES_NAME: str
     GOOGLE_CLIENT_ID: str
-
+    BACKEND_DIR: str
 
     """
     Map environment variables to class fields according to these rules:
@@ -41,7 +42,7 @@ class AppConfig:
             # Raise AppConfigError if required field not supplied
             default_value = getattr(self, field, None)
             if default_value is None and env.get(field) is None:
-                raise AppConfigError('The {} field is required'.format(field))
+                raise AppConfigError("The {} field is required".format(field))
 
             # Cast env var value to expected type and raise AppConfigError on failure
             try:
@@ -53,11 +54,10 @@ class AppConfig:
 
                 self.__setattr__(field, value)
             except ValueError:
-                raise AppConfigError('Unable to cast value of "{}" to type "{}" for "{}" field'.format(
-                    env[field],
-                    var_type,
-                    field
-                )
+                raise AppConfigError(
+                    'Unable to cast value of "{}" to type "{}" for "{}" field'.format(
+                        env[field], var_type, field
+                    )
                 )
 
     def __repr__(self):

@@ -5,47 +5,52 @@ from utils.configs import Config
 from db.connect import conn
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from fastapi import HTTPException
+
 # TODO: Does Google's verify_auth2_token() function retreive Google's certs every time the function is called? Is there any way to cache the response?
 
-async def db_authorize(email):
-  is_admin = False
-  try:
-    users = Table('users')
-    q = Query.from_(users).select(users.star).where(users.email == email)
-    with conn.cursor() as cur:
-      cur.execute(q.get_sql())
-      result = cur.fetchall()
-  except Exception as e:
-    is_admin = False
 
-  if result:
-    if result[0]['user_state'] == "Active":
-      if result[0]['user_type'] == "Admin":
-        is_admin = True
+async def db_authorize(email):
+    details = dict()
+    try:
+        # print("conn from db_authorize : ", conn)
+        users = Table("users")
+        q = Query.from_(users).select(users.star).where(users.email == email)
+        with conn.cursor() as cur:
+            cur.execute(q.get_sql())
+            result = cur.fetchone()
+    except Exception as e:
+        raise e
+
+    if result:
+        if result["user_state"] != "Active":
+            raise HTTPException(
+                404, detail="You are an inactive user. Contact admin to activate you!"
+            )
     else:
-      raise HTTPException(404, detail="You are an inactive user. Contact admin to activate you!")
-  else:
-    raise HTTPException(404, detail="You don't exist in our database. Contact admin to add you.")
-  return is_admin
-    
+        raise HTTPException(
+            404, detail="You don't exist in our database. Contact admin to add you."
+        )
+    details["email"] = email
+    details["user_type"] = result["user_type"]
+    return details
+
+
 async def get_email(request: Request):
     try:
         token = request.headers.get("Authorization")
         idinfo = id_token.verify_oauth2_token(
             token, requests.Request(), Config.GOOGLE_CLIENT_ID
         )
-        print(idinfo)
         email = idinfo["email"]
-
-        is_admin = await db_authorize(email)
-        print(is_admin)
-        if is_admin: 
-          return email
-        
-        raise HTTPException(403, detail="User is not an admin.")
+        return await db_authorize(email)
 
     except HTTPException as e:
-      raise e
+        raise e
     except ValueError:
         raise HTTPException(404, detail="We are not able to authenticate you.")
-    
+
+
+async def override_get_email(request: Request):
+    print("override_get_email func")
+    email = request.headers.get("Authorization")
+    return email

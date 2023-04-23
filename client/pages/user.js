@@ -84,7 +84,7 @@ export async function getServerSideProps(context) {
   const { req } = context;
   const session = await getSession({ req });
 
-  if (!session || session.statuscode == 404) {
+  if (!session?.ok) {
     return {
       redirect: {
         destination: "/",
