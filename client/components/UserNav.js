@@ -1,91 +1,54 @@
 import React from "react";
-import DropDown from "components/Dropdown";
+import DropDown from "./Dropdown";
 
-const AdminNav = ({ handleOptionClick, selectedOption }) => {
+const UserNav = ({ handleOptionClick, selectedOption }) => {
   const options = {
-    user: [
-      {
-        id: 1,
-        name: "Add User",
-      },
-      {
-        id: 2,
-        name: "Update User",
-      },
-      {
-        id: 3,
-        name: "Delete User",
-      },
-      {
-        id: 4,
-        name: "Display Users",
-      },
-    ],
     asset: [
       {
-        id: 11,
+        id: 1,
         name: "Add Asset",
       },
       {
-        id: 22,
+        id: 2,
         name: "Update Asset",
       },
       {
-        id: 33,
-        name: "Delete Asset",
-      },
-      {
-        id: 44,
+        id: 3,
         name: "Display Assets",
       },
     ],
     bulkAsset: [
       {
-        id: 111,
+        id: 11,
         name: "Add Bulk Asset",
       },
       {
-        id: 222,
+        id: 22,
         name: "Update Bulk Asset",
       },
       {
-        id: 333,
-        name: "Delete Bulk Asset",
-      },
-      {
-        id: 444,
+        id: 33,
         name: "Display Bulk Assets",
       },
     ],
     order: [
       {
-        id: 1111,
+        id: 111,
         name: "Add Order",
       },
       {
-        id: 2222,
+        id: 222,
         name: "Update Order",
       },
       {
-        id: 3333,
-        name: "Delete Order",
-      },
-      {
-        id: 4444,
+        id: 333,
         name: "Display Orders",
       },
     ],
   };
-
   return (
     <>
       <div className="flex justify-start">
-        <DropDown
-          handleOptionClick={handleOptionClick}
-          selectedOption={selectedOption}
-          options={options.user}
-          displayName={"User"}
-        />
         <DropDown
           handleOptionClick={handleOptionClick}
           selectedOption={selectedOption}
@@ -109,4 +72,4 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
   );
 };
 
-export default AdminNav;
+export default UserNav;

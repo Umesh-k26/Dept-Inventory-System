@@ -267,7 +267,10 @@ export const Form = ({ fields, apiLink, method, submitName, headers }) => {
   );
 };
 
-export const DeleteForm = ({ fields, apiLink, method, submitName, headers }) => {
-
-
-}
+export const DeleteForm = ({
+  fields,
+  apiLink,
+  method,
+  submitName,
+  headers,
+}) => {};

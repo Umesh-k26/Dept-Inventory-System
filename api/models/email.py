@@ -24,6 +24,7 @@ class EmailSchema(BaseModel):
 
 email = EmailSchema(email=["cs20btech11014@iith.ac.in"])
 
+
 async def send_email(subject: str, body: str):
     message = MessageSchema(
         subject=subject,

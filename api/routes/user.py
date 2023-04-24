@@ -4,11 +4,13 @@ from utils.auth import get_email
 from utils.configs import Config
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from db.connect import conn
-
+from fastapi import BackgroundTasks
 from models.db import User
 from fastapi import APIRouter
 
 from models.email import send_email_
+
+import threading
 
 import threading
 
@@ -20,20 +22,18 @@ origins = [
 
 # delete user has to be modified!!
 
+
 @router.post("/add-user")
-async def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
+def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
     try:
         users = Table("users")
-        q = (
-            Query.into(users)
-            .insert(
-                user.user_id,
-                user.first_name,
-                user.last_name,
-                user.email,
-                user.user_type,
-                user.department,
-            )
+        q = Query.into(users).insert(
+            user.user_id,
+            user.first_name,
+            user.last_name,
+            user.email,
+            user.user_type,
+            user.department,
         )
         q1 = Query.from_(users).select(users.star).where(users.user_id == user.user_id)
 
@@ -49,8 +49,11 @@ async def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        body = "Dear Admin,<br> The user with the following details has been added. <br>" + result_str
-        subject="User Added"
+        body = (
+            "Dear Admin,<br> The user with the following details has been added. <br>"
+            + result_str
+        )
+        subject = "User Added"
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
@@ -81,8 +84,11 @@ async def delete_user(user_id: str, email_: Annotated[str, Depends(get_email)]):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        subject="User Deleted"
-        body="Dear Admin,<br> The user with the following details has been deleted(Inactivated). <br>" + result_str
+        subject = "User Deleted"
+        body = (
+            "Dear Admin,<br> The user with the following details has been deleted(Inactivated). <br>"
+            + result_str
+        )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
@@ -120,8 +126,11 @@ async def update_user(user: User, email_: Annotated[str, Depends(get_email)]):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        subject="User Updated"
-        body="Dear Admin,<br> The user with the following details has been updated. <br>" + result_str
+        subject = "User Updated"
+        body = (
+            "Dear Admin,<br> The user with the following details has been updated. <br>"
+            + result_str
+        )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:

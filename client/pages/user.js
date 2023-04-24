@@ -1,79 +1,39 @@
 import React from "react";
 import { getSession } from "next-auth/react";
-import { AddUser, DeleteUser, UpdateUser } from "components/Admin/User";
-import { AddAsset, DeleteAsset, UpdateAsset } from "components/User/Asset";
-import { AddOrder, DeleteOrder, UpdateOrder } from "components/User/Order";
-import MUIDataTable from "mui-datatables";
+import { AddOrder, UpdateOrder, DisplayOrders } from "components/User/Order";
+import { AddAsset, UpdateAsset, DisplayAssets } from "components/User/Asset";
+import {
+  AddBulkAsset,
+  UpdateBulkAsset,
+  DisplayBulkAssets,
+} from "components/User/BulkAsset";
+import { useState } from "react";
+import UserNav from "components/UserNav";
 
 const User = () => {
-  const data = [
-    ["John Doe", "johndoe@gmail.com", "Male", "25"],
-    ["Jane Smith", "janesmith@gmail.com", "Female", "30"],
-    ["Bob Johnson", "bobjohnson@gmail.com", "Male", "45"],
-    ["Mary Davis", "marydavis@gmail.com", "Female", "32"],
-  ];
+  const [selectedOption, setSelectedOption] = useState(null);
 
-  const columns = [
-    {
-      name: "Name",
-      options: {
-        filter: true,
-        sort: true,
-      },
-    },
-    {
-      name: "Email",
-      options: {
-        filter: true,
-        sort: true,
-      },
-    },
-    {
-      name: "Gender",
-      options: {
-        filter: true,
-        sort: true,
-      },
-    },
-    {
-      name: "Age",
-      options: {
-        filter: false,
-        sort: true,
-      },
-    },
-  ];
-
-  const options = {
-    filterType: "dropdown",
-    download: true,
-    print: true,
-    selectableRows: "multiple",
-    responsive: "vertical",
+  const handleOptionClick = (option, callback) => {
+    setSelectedOption(option);
+    // console.log(selectedOption);
+    callback();
   };
-
   return (
     <>
-      <MUIDataTable data={data} columns={columns} options={options} />
-      <h1>User</h1>
+      <UserNav
+        handleOptionClick={handleOptionClick}
+        selectedOption={selectedOption}
+      />
 
-      <div>Add Asset</div>
-      <AddAsset />
-      <hr />
-      <div>Delete Asset</div>
-      <DeleteAsset />
-      <hr />
-      <div>Update Asset</div>
-      <UpdateAsset />
-      <hr />
-      <div>Add order</div>
-      <AddOrder />
-      <hr />
-      <div>Delete Order</div>
-      <DeleteOrder />
-      <hr />
-      <div>Update Order</div>
-      <UpdateOrder />
+      {selectedOption == 1 && <AddAsset />}
+      {selectedOption == 2 && <UpdateAsset />}
+      {selectedOption == 3 && <DisplayAssets />}
+      {selectedOption == 11 && <AddBulkAsset />}
+      {selectedOption == 22 && <UpdateBulkAsset />}
+      {selectedOption == 33 && <DisplayBulkAssets />}
+      {selectedOption == 111 && <AddOrder />}
+      {selectedOption == 222 && <UpdateOrder />}
+      {selectedOption == 333 && <DisplayOrders />}
     </>
   );
 };
