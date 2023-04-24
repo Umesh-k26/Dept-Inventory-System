@@ -38,12 +38,10 @@ def run_on_startup():
 @app.on_event("startup")
 def startup_event():
     threading.Thread(target=run_on_startup, daemon=True).start()
-    print("on start event")
 
 
 @app.get("/get-role/")
 async def get_test(details: Annotated[dict, Depends(get_email)]):
-    print(details)
     return details
 
 

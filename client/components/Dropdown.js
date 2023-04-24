@@ -12,7 +12,7 @@ const DropDown = ({
   const callback = () => setIsOpen(false);
   return (
     <>
-      <div className="flex flex-col w-full pb-10">
+      <div className="flex flex-col w-full pb-60">
         <div className="relative inline-block text-left mx-auto">
           <div className="mx-auto">
             <button
@@ -28,9 +28,8 @@ const DropDown = ({
           </div>
 
           <div
-            className={`absolute mx-auto z-10 mt-2 w-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 ${
-              isOpen ? "" : "hidden"
-            }`}
+            className={`absolute mx-auto z-10 mt-2 w-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 ${isOpen ? "" : "hidden"
+              }`}
             aria-labelledby="options-menu"
             role="menu"
           >
@@ -39,9 +38,8 @@ const DropDown = ({
                 return (
                   <button
                     key={option.id}
-                    className={`${
-                      selectedOption === option.id ? "bg-gray-200" : ""
-                    } block w-auto px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900`}
+                    className={`${selectedOption === option.id ? "bg-gray-200" : ""
+                      } block w-auto px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900`}
                     role="menuitem"
                     onClick={() => handleOptionClick(option.id, callback)}
                   >

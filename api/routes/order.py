@@ -10,8 +10,9 @@ from fastapi import APIRouter
 from models.db import Order_Table
 from models.responses import OrderDetails
 
-from models.email import email, conf
-from fastapi_mail import FastMail, MessageSchema, MessageType
+from models.email import send_email_
+
+import threading
 
 router = APIRouter()
 
@@ -23,7 +24,6 @@ origins = [
 @router.post("/add-order")
 async def add_order(order: Order_Table):
     try:
-        print(order)
         orders = Table("order_table")
         q = Query.into("order_table").insert(
             order.purchase_order_no,
@@ -58,16 +58,9 @@ async def add_order(order: Order_Table):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        message = MessageSchema(
-            subject="Order Added",
-            recipients=email.dict().get("email"),
-            body="Dear Admin,<br> The order with the following details has been added. <br>"
-            + result_str,
-            subtype=MessageType.html,
-        )
-
-        fm = FastMail(conf)
-        await fm.send_message(message)
+        subject="Order Added"
+        body="Dear Admin,<br> The order with the following details has been added. <br>" + result_str
+        threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
         print(e)
@@ -106,16 +99,9 @@ async def delete_asset(purchase_order_no: str, financial_year: int):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        message = MessageSchema(
-            subject="Order Deleted",
-            recipients=email.dict().get("email"),
-            body="Dear Admin,<br> The order with the following details has been deleted. <br>"
-            + result_str,
-            subtype=MessageType.html,
-        )
-
-        fm = FastMail(conf)
-        await fm.send_message(message)
+        subject="Order Deleted"
+        body="Dear Admin,<br> The order with the following details has been deleted. <br>" + result_str
+        threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
         print(e)
@@ -124,7 +110,7 @@ async def delete_asset(purchase_order_no: str, financial_year: int):
 
 
 @router.put("/update-order/")
-async def update_order(order_: Order_Table) -> Order_Table:
+async def update_order(order_: Order_Table) :
     try:
         order = Table("order_table")
         q = Query.update(order).where(
@@ -172,16 +158,9 @@ async def update_order(order_: Order_Table) -> Order_Table:
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        message = MessageSchema(
-            subject="Order Updated",
-            recipients=email.dict().get("email"),
-            body="Dear Admin,<br> The order with the following details has been updated. <br>"
-            + result_str,
-            subtype=MessageType.html,
-        )
-
-        fm = FastMail(conf)
-        await fm.send_message(message)
+        subject="Order Updated"
+        body="Dear Admin,<br> The order with the following details has been updated. <br>" + result_str
+        threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
         print(e)

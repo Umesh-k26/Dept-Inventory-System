@@ -8,8 +8,9 @@ from db.connect import conn
 from models.db import User
 from fastapi import APIRouter
 
-from models.email import email, conf
-from fastapi_mail import FastMail, MessageSchema, MessageType
+from models.email import send_email_
+
+import threading
 
 router = APIRouter()
 
@@ -17,6 +18,7 @@ origins = [
     "http://localhost:3000",
 ]
 
+# delete user has to be modified!!
 
 @router.post("/add-user")
 async def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
@@ -32,8 +34,6 @@ async def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
                 user.user_type,
                 user.department,
             )
-            .on_conflict(users.user_id)
-            .do_update(users.user_state, "Active")
         )
         q1 = Query.from_(users).select(users.star).where(users.user_id == user.user_id)
 
@@ -49,18 +49,10 @@ async def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        message = MessageSchema(
-            subject="User Added",
-            recipients=email.dict().get("email"),
-            body="Dear Admin,<br> The user with the following details has been added. <br>"
-            + result_str,
-            subtype=MessageType.html,
-        )
-        print("crossed fastmail")
-        fm = FastMail(conf)
-        await fm.send_message(message)
+        body = "Dear Admin,<br> The user with the following details has been added. <br>" + result_str
+        subject="User Added"
+        threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
-        print("waiting....")
     except Exception as e:
         print(e)
         conn.rollback()
@@ -89,16 +81,9 @@ async def delete_user(user_id: str, email_: Annotated[str, Depends(get_email)]):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        message = MessageSchema(
-            subject="User Deleted",
-            recipients=email.dict().get("email"),
-            body="Dear Admin,<br> The user with the following details has been deleted(Inactivated). <br>"
-            + result_str,
-            subtype=MessageType.html,
-        )
-
-        fm = FastMail(conf)
-        await fm.send_message(message)
+        subject="User Deleted"
+        body="Dear Admin,<br> The user with the following details has been deleted(Inactivated). <br>" + result_str
+        threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
         print(e)
@@ -135,16 +120,9 @@ async def update_user(user: User, email_: Annotated[str, Depends(get_email)]):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        message = MessageSchema(
-            subject="User Updated",
-            recipients=email.dict().get("email"),
-            body="Dear Admin,<br> The user with the following details has been updated. <br>"
-            + result_str,
-            subtype=MessageType.html,
-        )
-
-        fm = FastMail(conf)
-        await fm.send_message(message)
+        subject="User Updated"
+        body="Dear Admin,<br> The user with the following details has been updated. <br>" + result_str
+        threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
         print(e)
@@ -203,7 +181,6 @@ async def get_all_user():
         cur.execute(q.get_sql())
         results = cur.fetchall()
     list_ = []
-    print(results)
     data = []
     columns = [
         "user_id",
@@ -216,11 +193,7 @@ async def get_all_user():
     ]
     for i in results:
         for j in i:
-            print(i[j])
             list_.append(i[j])
-            print(list_)
         data.append(list_.copy())
         list_.clear()
-    # columns.append(data.copy())
-    print(columns)
     return {"column_name": columns, "values": data}

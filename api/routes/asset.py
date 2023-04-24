@@ -1,6 +1,4 @@
-from fastapi import Depends, HTTPException, UploadFile, File, Body, Request
-from typing import Annotated
-from utils.configs import Config
+from fastapi import HTTPException, Request
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from psycopg2 import Binary
 from db.connect import conn
@@ -8,12 +6,11 @@ from db.connect import conn
 from models.db import Asset
 from models.responses import AssetDetails
 
-import datetime
 from fastapi import APIRouter
 
-from fastapi_mail import FastMail, MessageSchema, MessageType
+from models.email import send_email_
 
-from models.email import email, conf
+import threading
 
 router = APIRouter()
 
@@ -27,15 +24,11 @@ async def add_asset(req: Request):
     formData = await req.form()
 
     asset = dict()
-    # print(formData.keys())
-    # return
     for key in formData.keys():
         if formData.get(key) == "":
             asset[key] = None
         else:
             asset[key] = formData.get(key)
-    print(asset)
-    # return
     if asset["picture"] is not None:
         pic = await asset["picture"].read()
         pic = Binary(pic)
@@ -80,16 +73,9 @@ async def add_asset(req: Request):
             if i != "picture":
                 result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        message = MessageSchema(
-            subject="Asset Added",
-            recipients=email.dict().get("email"),
-            body="Dear Admin,<br> The asset with the following details has been added. <br>"
-            + result_str,
-            subtype=MessageType.html,
-        )
-
-        fm = FastMail(conf)
-        await fm.send_message(message)
+        subject="Asset Added"
+        body="Dear Admin,<br> The asset with the following details has been added. <br>" + result_str
+        threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
         print(e)
@@ -125,16 +111,10 @@ async def delete_asset(serial_no: str):
             if i != "picture":
                 result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        message = MessageSchema(
-            subject="Asset Deleted",
-            recipients=email.dict().get("email"),
-            body="Dear Admin,<br> The asset with the following details has been deleted. <br>"
-            + result_str,
-            subtype=MessageType.html,
-        )
+        subject="Asset Deleted"
+        body="Dear Admin,<br> The asset with the following details has been deleted. <br>" + result_str
+        threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
-        fm = FastMail(conf)
-        await fm.send_message(message)
 
     except Exception as e:
         print(e)
@@ -215,18 +195,10 @@ async def update_asset(req: Request):
             if i != "picture":
                 result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        message = MessageSchema(
-            subject="Asset Updated",
-            recipients=email.dict().get("email"),
-            body="Dear Admin,<br> The asset with the following details has been updated. <br>"
-            + result_str,
-            subtype=MessageType.html,
-        )
+        subject="Asset Updated"
+        body="Dear Admin,<br> The asset with the following details has been updated. <br>" + result_str
+        threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
-        fm = FastMail(conf)
-        await fm.send_message(message)
-
-        print(result)
     except Exception as e:
         print(e)
         conn.rollback()

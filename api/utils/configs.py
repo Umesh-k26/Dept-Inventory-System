@@ -25,7 +25,16 @@ class AppConfig:
     POSTGRES_PASS: str
     POSTGRES_NAME: str
     GOOGLE_CLIENT_ID: str
-    BACKEND_DIR: str
+    # BACKEND_DIR: str
+    MAIL_USERNAME: str 
+    MAIL_PASSWORD: str
+    MAIL_FROM: str 
+    MAIL_PORT: int 
+    MAIL_SERVER: str
+    MAIL_STARTTLS: bool
+    MAIL_SSL_TLS: bool
+    MAIL_USE_CREDENTIALS: bool
+    MAIL_VALIDATE_CERTS: bool
 
     """
     Map environment variables to class fields according to these rules:
