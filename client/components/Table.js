@@ -38,7 +38,7 @@ export const DataTable = ({ apiLink, method, tableName }) => {
     };
     getData();
     console.log(tableData);
-  }, []);
+  }, [apiLink, method, tableData]);
 
   if (tableData) {
     console.log(tableData);
@@ -56,7 +56,7 @@ export const DataTable = ({ apiLink, method, tableName }) => {
                 innerWidth: "auto",
                 outerWidth: "auto",
                 overFlowX: "hidden",
-                wordwrap: true
+                wordwrap: true,
               },
             };
           },

@@ -12,7 +12,7 @@ const DropDown = ({
   const callback = () => setIsOpen(false);
   return (
     <>
-      <div className="flex flex-col w-full pb-60">
+      <div className="flex flex-col w-full pb-10">
         <div className="relative inline-block text-left mx-auto">
           <div className="mx-auto">
             <button
@@ -38,6 +38,7 @@ const DropDown = ({
               {options?.map((option) => {
                 return (
                   <button
+                    key={option.id}
                     className={`${
                       selectedOption === option.id ? "bg-gray-200" : ""
                     } block w-auto px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900`}
