@@ -51,6 +51,5 @@ async def get_email(request: Request):
 
 
 async def override_get_email(request: Request):
-    print("override_get_email func")
     email = request.headers.get("Authorization")
     return email

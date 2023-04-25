@@ -4,10 +4,7 @@ from utils.auth import get_email, override_get_email
 import pytest
 
 
-@pytest.fixture
-def client():
-    with TestClient(app) as c:
-        yield c
+client = TestClient(app)
 
 
 if __name__ == "__main__":

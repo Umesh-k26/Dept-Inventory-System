@@ -27,14 +27,7 @@ origins = [
 def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
     try:
         users = Table("users")
-        q = Query.into(users).insert(
-            user.user_id,
-            user.first_name,
-            user.last_name,
-            user.email,
-            user.user_type,
-            user.department,
-        )
+        q = Query.into(users).insert(*user.dict().values())
         q1 = Query.from_(users).select(users.star).where(users.user_id == user.user_id)
 
         with conn.cursor() as cur:
@@ -102,20 +95,10 @@ async def update_user(user: User, email_: Annotated[str, Depends(get_email)]):
     try:
         users = Table("users")
         q = Query.update(users).where(users.user_id == user.user_id)
+        for k, v in user.dict(exclude_none=True, exclude_defaults=True).items():
+            q = q.set(k, v)
         q1 = Query.from_(users).select(users.star).where(users.user_id == user.user_id)
-        set_list = {}
-        if user.user_type:
-            set_list[users.user_type] = user.user_type
-        if user.email:
-            set_list[users.email] = user.email
-        if user.department:
-            set_list[users.department] = user.department
-        if user.first_name:
-            set_list[users.first_name] = user.first_name
-        if user.last_name:
-            set_list[users.last_name] = user.last_name
-        for k in set_list.keys():
-            q = q.set(k, set_list[k])
+
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             cur.execute(q1.get_sql())
@@ -158,21 +141,20 @@ def get_user(user_id: str) -> User:
 def filter_user(user: User, email_: Annotated[str, Depends(get_email)]) -> list[User]:
     try:
         users = Table("users")
-        q = Query.from_(users).select(users.star)
-        criterion_list = []
-        if user.user_id:
-            criterion_list.append(users.user_id.ilike(f"%{user.user_id}%"))
-        if user.user_type:
-            criterion_list.append(users.user_type.ilike(f"{user.user_type}"))
-        if user.email:
-            criterion_list.append(users.email == user.email)
-        if user.department:
-            criterion_list.append(users.department.ilike(f"%{user.department}%"))
-        if user.first_name:
-            criterion_list.append(users.first_name.ilike(f"%{user.first_name}%"))
-        if user.last_name:
-            criterion_list.append(users.last_name.ilike(f"%{user.last_name}%"))
-        q = q.where(Criterion.all(criterion_list))
+        q = (
+            Query.from_(users)
+            .select(users.star)
+            .where(
+                Criterion.all(
+                    [
+                        users[k].ilike(f"%{v}%")
+                        for k, v in user.dict(
+                            exclude_none=True, exclude_defaults=True, exclude_unset=True
+                        ).items()
+                    ]
+                )
+            )
+        )
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             results = cur.fetchall()

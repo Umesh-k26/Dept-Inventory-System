@@ -11,7 +11,7 @@ class User(BaseModel):
     email: str | None = None
     user_type: str | None = None
     department: str | None = None
-    user_state: str | None = None
+    user_state: str = "Active"
 
 
 class Asset(BaseModel):
@@ -29,7 +29,7 @@ class Asset(BaseModel):
     system_no: str | None = None
     purchase_order_no: str | None = None
     asset_state: str | None = None
-    picture: UploadFile | None = None  
+    picture: UploadFile | None = None
 
     @classmethod
     def __get_validators__(cls):

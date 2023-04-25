@@ -2,7 +2,7 @@ from test_main import client
 from models.db import User
 
 
-def test_add_user(client):
+def test_add_user():
     res = client.post(
         "/add-user",
         headers={"Authorization": "cs20btech11024@iith.ac.in"},
@@ -34,3 +34,15 @@ def test_add_user(client):
     )
     assert res.status_code == 200
     assert res.json() == {"detail": "user added"}
+
+
+def test_filter_users():
+    res = client.post(
+        "/get-user",
+        headers={"Authorization": "cs20btech11024@iith.ac.in"},
+        json=User(user_type="Stud", department="CSE").dict(),
+    )
+    data = res.json()
+    assert res.status_code == 200
+    for user in data:
+        print(user)

@@ -58,8 +58,11 @@ async def add_order(order: Order_Table):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        subject="Order Added"
-        body="Dear Admin,<br> The order with the following details has been added. <br>" + result_str
+        subject = "Order Added"
+        body = (
+            "Dear Admin,<br> The order with the following details has been added. <br>"
+            + result_str
+        )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
@@ -99,8 +102,11 @@ async def delete_asset(purchase_order_no: str, financial_year: int):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        subject="Order Deleted"
-        body="Dear Admin,<br> The order with the following details has been deleted. <br>" + result_str
+        subject = "Order Deleted"
+        body = (
+            "Dear Admin,<br> The order with the following details has been deleted. <br>"
+            + result_str
+        )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
@@ -110,7 +116,7 @@ async def delete_asset(purchase_order_no: str, financial_year: int):
 
 
 @router.put("/update-order/")
-async def update_order(order_: Order_Table) :
+async def update_order(order_: Order_Table):
     try:
         order = Table("order_table")
         q = Query.update(order).where(
@@ -158,8 +164,11 @@ async def update_order(order_: Order_Table) :
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        subject="Order Updated"
-        body="Dear Admin,<br> The order with the following details has been updated. <br>" + result_str
+        subject = "Order Updated"
+        body = (
+            "Dear Admin,<br> The order with the following details has been updated. <br>"
+            + result_str
+        )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
