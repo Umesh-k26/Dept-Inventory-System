@@ -28,6 +28,7 @@ class Asset(BaseModel):
     is_hardware: str | None = None
     system_no: str | None = None
     purchase_order_no: str | None = None
+    financial_year: int | None = None
     asset_state: str | None = None
     picture: UploadFile | None = None
 
@@ -46,13 +47,14 @@ class Bulk_Asset(BaseModel):
     asset_name: str | None = None
     model: str | None = None
     asset_make: str | None = None
-    serial_no: str | None = None
+    serial_no: str | None = None  # primary key
     department: str | None = None
-    asset_location: str | None = None
+    asset_location: str | None = None  # primary key
     asset_type: str | None = None
     entry_date: datetime.date | None = None
     quantity: int | None = None
     purchase_order_no: str | None = None
+    financial_year: int | None = None
     asset_state: str | None = None
     picture: UploadFile | None = None
 

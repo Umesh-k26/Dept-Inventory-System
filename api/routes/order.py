@@ -25,20 +25,7 @@ origins = [
 async def add_order(order: Order_Table):
     try:
         orders = Table("order_table")
-        q = Query.into("order_table").insert(
-            order.purchase_order_no,
-            order.order_date,
-            order.indentor,
-            order.firm_name,
-            order.financial_year,
-            order.final_procurement_date,
-            order.invoice_no,
-            order.invoice_date,
-            order.total_price,
-            order.source_of_fund,
-            order.fund_info,
-            order.other_details,
-        )
+        q = Query.into("order_table").insert(*order.dict().values())
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
         conn.commit()
@@ -123,6 +110,8 @@ async def update_order(order_: Order_Table):
             (order.purchase_order_no == order_.purchase_order_no)
             & (order.financial_year == order_.financial_year)
         )
+        for k, v in order_.dict(exclude_none=True, exclude_defaults=True).items():
+            q = q.set(k, v)
         q1 = (
             Query.from_(order)
             .select(order.star)
@@ -131,29 +120,6 @@ async def update_order(order_: Order_Table):
                 & (order.financial_year == order_.financial_year)
             )
         )
-        set_list = {}
-        if order_.order_date:
-            set_list["order_date"] = order_.order_date
-        if order_.indentor:
-            set_list["indentor"] = order_.indentor
-        if order_.firm_name:
-            set_list["firm_name"] = order_.firm_name
-        if order_.final_procurement_date:
-            set_list["final_procurement_date"] = order_.final_procurement_date
-        if order_.invoice_no:
-            set_list["invoice_no"] = order_.invoice_no
-        if order_.invoice_date:
-            set_list["invoice_date"] = order_.invoice_date
-        if order_.total_price:
-            set_list["total_price"] = order_.total_price
-        if order_.source_of_fund:
-            set_list["source_of_fund"] = order_.source_of_fund
-        if order_.fund_info:
-            set_list["fund_info"] = order_.fund_info
-        if order_.other_details:
-            set_list["other_details"] = order_.other_details
-        for k in set_list.keys():
-            q = q.set(k, set_list[k])
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             cur.execute(q1.get_sql())
@@ -184,32 +150,20 @@ async def get_order(order_: Order_Table) -> list[OrderDetails]:
         order = Table("order_table")
         user = Table("users")
         asset = Table("asset")
-        criterion_list = []
-        if order_.purchase_order_no:
-            criterion_list.append(
-                order.purchase_order_no.ilike(f"%{order_.purchase_order_no}%")
+        q = (
+            Query.from_(order)
+            .select(order.star)
+            .where(
+                Criterion.all(
+                    [
+                        order[k].ilike(f"%{v}%")
+                        for k, v in order_.dict(
+                            exclude_none=True, exclude_defaults=True, exclude_unset=True
+                        ).items()
+                    ]
+                )
             )
-        if order_.order_date:
-            criterion_list.append(order.order_date.ilike(f"%{order_.order_date}%"))
-        if order_.indentor:
-            criterion_list.append(order.indentor.ilike(f"%{order_.indentor}%"))
-        if order_.firm_name:
-            criterion_list.append(order.firm_name.ilike(f"%{order_.firm_name}%"))
-        if order_.financial_year:
-            criterion_list.append(
-                order.financial_year.ilike(f"%{order_.financial_year}%")
-            )
-        if order_.gst_tin:
-            criterion_list.append(order.gst_tin.ilike(f"%{order_.gst_tin}%"))
-        if order_.final_procurement_date:
-            criterion_list.append(
-                order.final_procurement_date.ilike(f"%{order_.final_procurement_date}%")
-            )
-        if order_.invoice_no:
-            criterion_list.append(order.invoice_no.ilike(f"%{order_.invoice_no}%"))
-        if order_.invoice_date:
-            criterion_list.append(order.invoice_date.ilike(f"%{order_.invoice_date}%"))
-        q = Query.from_(order).select(order.star).where(Criterion.all(criterion_list))
+        )
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             order_details = cur.fetchall()

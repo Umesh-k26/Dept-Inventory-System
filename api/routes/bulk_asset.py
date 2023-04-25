@@ -36,22 +36,12 @@ async def add_bulk_asset(req: Request):
         pic = Binary(pic)
     else:
         pic = None
-
+    if "picture" in asset.keys():
+        asset.pop("picture")
     try:
         asset_ = Table("bulk_asset")
         q = Query.into("bulk_asset").insert(
-            asset["asset_name"],
-            asset["model"],
-            asset["asset_make"],
-            asset["serial_no"],
-            asset["department"],
-            asset["asset_location"],
-            asset["asset_type"],
-            asset["entry_date"],
-            asset["quantity"],
-            asset["purchase_order_no"],
-            asset["financial_year"],
-            asset["asset_state"],
+            *asset.values(),
             pic,
         )
         q1 = (
@@ -72,8 +62,11 @@ async def add_bulk_asset(req: Request):
             if i != "picture":
                 result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        subject="Asset Added"
-        body="Dear Admin,<br> The asset with the following details has been added. <br>" + result_str
+        subject = "Asset Added"
+        body = (
+            "Dear Admin,<br> The asset with the following details has been added. <br>"
+            + result_str
+        )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
@@ -114,8 +107,11 @@ async def delete_bulk_asset(serial_no: str, asset_location: str):
             if i != "picture":
                 result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        subject="Asset Deleted"
-        body="Dear Admin,<br> The asset with the following details has been deleted. <br>" + result_str
+        subject = "Asset Deleted"
+        body = (
+            "Dear Admin,<br> The asset with the following details has been deleted. <br>"
+            + result_str
+        )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
@@ -140,45 +136,22 @@ async def update_bulk_asset(req: Request):
         pic = Binary(pic)
     else:
         pic = None
-
+    if "picture" in asset_.keys():
+        asset_.pop("picture")
     try:
         asset = Table("bulk_asset")
         q = Query.update(asset).where(asset.serial_no == asset_["serial_no"])
+        for k, v in asset_.items():
+            if asset_[k] is not None:
+                q = q.set(k, v)
+        if pic != None:
+            q = q.set("picture", pic)
         q1 = (
             Query.from_(asset)
             .select(asset.star)
             .where(asset.serial_no == asset_["serial_no"])
         )
 
-        set_list = {}
-        if asset_["asset_name"]:
-            set_list["asset_name"] = asset_["asset_name"]
-        if asset_["model"]:
-            set_list["model"] = asset_["model"]
-        if asset_["asset_make"]:
-            set_list["asset_make"] = asset_["asset_make"]
-        if asset_["serial_no"]:
-            set_list["serial_no"] = asset_["serial_no"]
-        if asset_["department"]:
-            set_list["department"] = asset_["department"]
-        if asset_["asset_location"]:
-            set_list["asset_location"] = asset_["asset_location"]
-        if asset_["asset_type"]:
-            set_list["asset_type"] = asset_["asset_type"]
-        if asset_["entry_date"]:
-            set_list["entry_date"] = asset_["entry_date"]
-        if asset_["quantity"]:
-            set_list["quantity"] = asset_["quantity"]
-        if asset_["purchase_order_no"]:
-            set_list["purchase_order_no"] = asset_["purchase_order_no"]
-        if asset_["financial_year"]:
-            set_list["financial_year"] = asset_["financial_year"]
-        if asset_["asset_state"]:
-            set_list["asset_state"] = asset_["asset_state"]
-        if pic != None:
-            set_list["picture"] = pic
-        for k in set_list.keys():
-            q = q.set(k, set_list[k])
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             cur.execute(q1.get_sql())
@@ -190,8 +163,11 @@ async def update_bulk_asset(req: Request):
             if i != "picture" or i != "barcode":
                 result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        subject="Asset Updated"
-        body="Dear Admin,<br> The asset with the following details has been updated. <br>" + result_str
+        subject = "Asset Updated"
+        body = (
+            "Dear Admin,<br> The asset with the following details has been updated. <br>"
+            + result_str
+        )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
 
     except Exception as e:
@@ -207,56 +183,42 @@ def filter_asset(asset_: Bulk_Asset) -> list[AssetDetails]:
         asset = Table("bulk_asset")
         order = Table("order_table")
 
-        criterion_list = []
-        if asset_.serial_no:
-            criterion_list.append(asset.serial_no.ilike(f"%{asset_.serial_no}%"))
-        if asset_.asset_name:
-            criterion_list.append(asset.asset_name.ilike(f"%{asset_.asset_name}%"))
-        if asset_.model:
-            criterion_list.append(asset.model.ilike(f"%{asset_.model}%"))
-        if asset_.department:
-            criterion_list.append(asset.department.ilike(f"%{asset_.department}%"))
-        if asset_.asset_location:
-            criterion_list.append(
-                asset.asset_location.ilike(f"%{asset_.asset_location}%")
+        q = (
+            Query.from_(asset)
+            .select(asset.star)
+            .where(
+                Criterion.all(
+                    [
+                        asset[k].ilike(f"%{v}%")
+                        for k, v in asset_.dict(
+                            exclude_none=True, exclude_defaults=True, exclude_unset=True
+                        ).items()
+                    ]
+                )
             )
-        if asset_.entry_date:
-            criterion_list.append(asset.entry_date.ilike(f"%{asset_.entry_date}%"))
-        if asset_.quantity:
-            criterion_list.append(asset.quantity.ilike(f"{asset_.quantity}"))
-        if asset_.purchase_order_no:
-            criterion_list.append(
-                asset.purchase_order_no.ilike(f"%{asset_.purchase_order_no}%")
-            )
-        if asset_.financial_year:
-            criterion_list.append(
-                asset.financial_year.ilike(f"{asset_.financial_year}")
-            )
-        if asset_.asset_state:
-            criterion_list.append(asset.asset_state.ilike(f"%{asset_.asset_state}%"))
-
-        q = Query.from_(asset).select(asset.star).where(Criterion.all(criterion_list))
+        )
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             asset_details = cur.fetchall()
-        order_list = set([i["purchase_order_no"] for i in asset_details])
-        q1 = (
-            Query.from_(order)
-            .select(order.star)
-            .where(Criterion.any(order.purchase_order_no == i for i in order_list))
-        )
-        with conn.cursor() as cur:
-            cur.execute(q1.get_sql())
-            order_details = cur.fetchall()
-        for i in asset_details:
-            for j in order_details:
-                if i["purchase_order_no"] == j["purchase_order_no"]:
-                    i.update(j)
+        # order_list = set([i["purchase_order_no"] for i in asset_details])
+        # q1 = (
+        #     Query.from_(order)
+        #     .select(order.star)
+        #     .where(Criterion.any(order.purchase_order_no == i for i in order_list))
+        # )
+        # with conn.cursor() as cur:
+        #     cur.execute(q1.get_sql())
+        #     order_details = cur.fetchall()
+        # for i in asset_details:
+        #     for j in order_details:
+        #         if i["purchase_order_no"] == j["purchase_order_no"]:
+        #             i.update(j)
+        return asset_details
     except Exception as e:
         print(e)
         raise HTTPException(201, "filters not found")
 
-    return [AssetDetails.parse_obj(asset) for asset in asset_details]
+    # return [AssetDetails.parse_obj(asset) for asset in asset_details]
 
 
 @router.get("/get-all-bulk-asset")

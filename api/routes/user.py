@@ -56,16 +56,18 @@ def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
     return {"detail": "user added"}
 
 
-@router.delete("/delete-user/{user_id}")
-async def delete_user(user_id: str, email_: Annotated[str, Depends(get_email)]):
+@router.put("/activate-deactivate-user/{user_id}/{user_state}")
+def activate_deactivate_user(
+    user_id: str, user_state: str, email_: Annotated[str, Depends(get_email)]
+):
     try:
         users = Table("users")
         q1 = Query.from_(users).select(users.star).where(users.user_id == user_id)
-        q = (
-            Query.update(users)
-            .where(users.user_id.ilike(f"{user_id}"))
-            .set(users.user_state, "Inactive")
-        )
+        q = Query.update(users).where(users.user_id.ilike(f"{user_id}"))
+        if user_state == "Active":
+            q = q.set(users.user_state, "Active")
+        elif user_state == "Inactive":
+            q = q.set(users.user_state, "Inactive")
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
         conn.commit()
@@ -77,9 +79,9 @@ async def delete_user(user_id: str, email_: Annotated[str, Depends(get_email)]):
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
 
-        subject = "User Deleted"
+        subject = "User State Change"
         body = (
-            "Dear Admin,<br> The user with the following details has been deleted(Inactivated). <br>"
+            "Dear Admin,<br> The user state of the user with the following details has been changed. <br>"
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
@@ -87,11 +89,11 @@ async def delete_user(user_id: str, email_: Annotated[str, Depends(get_email)]):
     except Exception as e:
         print(e)
         raise HTTPException(201, "User not found")
-    return {"detail": "user deleted"}
+    return {"detail": "user state changed"}
 
 
 @router.put("/update-user/")
-async def update_user(user: User, email_: Annotated[str, Depends(get_email)]):
+def update_user(user: User, email_: Annotated[str, Depends(get_email)]):
     try:
         users = Table("users")
         q = Query.update(users).where(users.user_id == user.user_id)
@@ -165,7 +167,7 @@ def filter_user(user: User, email_: Annotated[str, Depends(get_email)]) -> list[
 
 
 @router.get("/get-all-user")
-async def get_all_user():
+def get_all_user():
     user = Table("users")
     q = Query.from_(user).select(user.star)
     with conn.cursor() as cur:
