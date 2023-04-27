@@ -1,7 +1,7 @@
 import React from "react";
 import {
   AddUser,
-  DeleteUser,
+  ActivateDeactivateUser,
   UpdateUser,
   DisplayUsers,
 } from "components/Admin/User";
@@ -10,6 +10,7 @@ import {
   DeleteAsset,
   UpdateAsset,
   DisplayAssets,
+  AssetsBarcode
 } from "components/User/Asset";
 import {
   AddBulkAsset,
@@ -44,12 +45,13 @@ const Admin = ({ session }) => {
 
       {selectedOption == 1 && <AddUser />}
       {selectedOption == 2 && <UpdateUser />}
-      {selectedOption == 3 && <DeleteUser />}
+      {selectedOption == 3 && <ActivateDeactivateUser />}
       {selectedOption == 4 && <DisplayUsers />}
       {selectedOption == 11 && <AddAsset />}
       {selectedOption == 22 && <UpdateAsset />}
       {selectedOption == 33 && <DeleteAsset />}
       {selectedOption == 44 && <DisplayAssets />}
+      {selectedOption == 55 && <AssetsBarcode />}
       {selectedOption == 111 && <AddBulkAsset />}
       {selectedOption == 222 && <UpdateBulkAsset />}
       {selectedOption == 333 && <DeleteBulkAsset />}

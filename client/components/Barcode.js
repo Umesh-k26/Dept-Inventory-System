@@ -1,8 +1,10 @@
-import { useRef, useState } from "react";
+import Barcode from "react-barcode";
+import React, { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import Container from "./Container";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+
 
 const FormField = ({ field }) => {
   const { id, type, required, label, accept, options } = field;
@@ -172,7 +174,15 @@ const FormField = ({ field }) => {
   }
 };
 
-export const Form = ({ fields, apiLink, method, submitName, headers }) => {
+export const BarcodeGenerator = ({
+  fields,
+  apiLink,
+  method,
+  submitName,
+  headers,
+}) => {
+  const [barcodeValues, setBarcodeValues] = useState([]);
+  const [assetDetails, setAssetDetails] = useState([]);
   const { data: session, status } = useSession();
   const [message, setMessage] = useState();
   const [loading, setLoading] = useState(false);
@@ -222,11 +232,21 @@ export const Form = ({ fields, apiLink, method, submitName, headers }) => {
       });
       const data = await res.json();
       console.log(data);
-      alert(data.detail);
+
+      setBarcodeValues([]);
+      setAssetDetails([])
+      
+      for (var i = 0; i < data[0].length; i++)
+      {
+        const s_no = data[0][i]
+        const name = data[1][i]
+        setBarcodeValues(oldArray => [...oldArray, s_no]);
+        setAssetDetails(oldArray => [...oldArray, name])
+      }    
+      
       formRef.current.reset();
     } catch (err) {
       console.error(err);
-      alert(err.message);
     }
     setLoading(false);
   };
@@ -260,18 +280,16 @@ export const Form = ({ fields, apiLink, method, submitName, headers }) => {
           )}
         </div>
       </form>
-      {/* <div id="message" 
-          style="display:none">
-          Successful!
-      </div> */}
+      <>
+        {barcodeValues.map((barcodeValue, index) => (
+          <div>
+          <p>{assetDetails[index]}</p>
+          <Barcode key={barcodeValue} value={barcodeValue} />
+          </div>
+        ))}
+      </>
     </Container>
   );
 };
 
-export const DeleteForm = ({
-  fields,
-  apiLink,
-  method,
-  submitName,
-  headers,
-}) => {};
+export default BarcodeGenerator;

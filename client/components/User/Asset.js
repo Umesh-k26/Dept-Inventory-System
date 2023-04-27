@@ -1,6 +1,7 @@
 import React, { useContext, useRef } from "react";
 import { Form } from "components/Form";
 import DataTable from "components/Table";
+import BarcodeGenerator from "components/Barcode";
 
 export const AddAsset = () => {
   const date = new Date();
@@ -34,7 +35,6 @@ export const AddAsset = () => {
       ],
     },
     { type: "date", id: "entry_date", required: false, label: "Entry Date" },
-    // { type: "number", id: "unit_price", required: false, label: "Unit Price", min: 0, },
     { type: "date", id: "warranty", required: false, label: "Warranty" },
     {
       type: "select",
@@ -147,7 +147,6 @@ export const UpdateAsset = () => {
       ],
     },
     { type: "date", id: "entry_date", required: false, label: "Entry Date" },
-    // { type: "number", id: "unit_price", required: false, label: "Unit Price" },
     { type: "date", id: "warranty", required: false, label: "Warranty" },
     {
       type: "select",
@@ -217,6 +216,98 @@ export const DisplayAssets = () => {
   );
 };
 
+export const AssetsBarcode = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const fields = [
+    { type: "text", id: "serial_no", required: false, label: "Serial No" },
+    { type: "text", id: "asset_name", required: false, label: "Asset Name" },
+    { type: "text", id: "model", required: false, label: "Model" },
+    { type: "text", id: "asset_make", required: false, label: "Asset Make" },
+    {
+      type: "text",
+      id: "department",
+      required: false,
+      label: "Department",
+    },
+    {
+      type: "text",
+      id: "asset_location",
+      required: false,
+      label: "Asset Location",
+    },
+    {
+      type: "text",
+      id: "asset_holder",
+      required: false,
+      label: "Asset Holder",
+    },
+    {
+      type: "select",
+      id: "asset_type",
+      required: false,
+      label: "Asset Type",
+      options: [
+        { value: "", label: "Select" },
+        { value: "consumable", label: "Consumable" },
+        { value: "non_consumable", label: "Non Consumable" },
+      ],
+    },
+    { type: "date", id: "entry_date", required: false, label: "Entry Date" },
+    { type: "date", id: "warranty", required: false, label: "Warranty" },
+    {
+      type: "select",
+      id: "is_hardware",
+      required: false,
+      label: "Hardware",
+      options: [
+        { value: "", label: "Select" },
+        { value: "false", label: "No" },
+        { value: "true", label: "Yes" },
+      ],
+    },
+    { type: "text", id: "system_no", required: false, label: "System No" },
+    {
+      type: "text",
+      id: "purchase_order_no",
+      required: false,
+      label: "Purchase Order No",
+    },
+    {
+      type: "number",
+      id: "financial_year",
+      required: false,
+      step: "1",
+      min: 2000,
+      currentYear: year,
+      label: "Financial Year",
+    },
+    {
+      type: "select",
+      id: "asset_state",
+      required: false,
+      label: "Asset State",
+      options: [
+        { value: "", label: "Select" },
+        { value: "in_use", label: "In Use" },
+        { value: "in_store", label: "In Store" },
+        { value: "sold", label: "Sold" },
+      ],
+    },
+  ];
+
+  const apiLink = "http://localhost:8000/get-asset";
+
+  return (
+    <>
+      <BarcodeGenerator 
+        fields={fields}
+        apiLink={apiLink}
+        method={"POST"}
+        submitName={"Generate Barcode"}/>
+    </>
+  )
+};
 // export const AllAssets = () => {};
 // export const AddAsset = () => {
 //   const baseURL = process.env.REACT_APP_API_BASEURL;

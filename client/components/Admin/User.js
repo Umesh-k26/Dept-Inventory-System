@@ -36,19 +36,29 @@ export const AddUser = () => {
   );
 };
 
-export const DeleteUser = () => {
+export const ActivateDeactivateUser = () => {
   const fields = [
     { type: "text", id: "user_id", required: true, label: "User Id" },
+    {
+      type: "select",
+      id: "user_state",
+      required: true,
+      label: "User State",
+      options: [
+        { value: "Active", label: "Active" },
+        { value: "Inactive", label: "Deactivate" },
+      ],
+    },
   ];
-  const apiLink = "http://localhost:8000/delete-user/${user_id}";
+  const apiLink = "http://localhost:8000/activate-deactivate-user/${user_id}/${user_state}";
 
   return (
     <>
       <Form
         fields={fields}
         apiLink={apiLink}
-        method={"DELETE"}
-        submitName={"Delete User"}
+        method={"PUT"}
+        submitName={"Change User State"}
       />
     </>
   );

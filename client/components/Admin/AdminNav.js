@@ -14,7 +14,7 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
       },
       {
         id: 3,
-        name: "Delete User",
+        name: "Activate/Deactivate User",
       },
       {
         id: 4,
@@ -38,6 +38,10 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
         id: 44,
         name: "Display Assets",
       },
+      {
+        id: 55,
+        name: "Assets Barcode"
+      }
     ],
     bulkAsset: [
       {
