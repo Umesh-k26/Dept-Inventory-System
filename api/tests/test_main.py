@@ -39,10 +39,10 @@ def test_add_user():
         "/add-user",
         headers={"Authorization": "cs20btech11024@iith.ac.in"},
         json=User(
-            user_id="cs20btech11014",
-            first_name="Diya",
-            last_name="Goyal",
-            email="cs20btech11014@iith.ac.in",
+            user_id="cs20btech11015",
+            first_name="Aarthi",
+            last_name="Dontha",
+            email="cs20btech11015@iith.ac.in",
             department="CSE",
             user_state="Active",
             user_type="Admin",
@@ -50,6 +50,97 @@ def test_add_user():
     )
     assert res.status_code == 200
     assert res.json() == {"detail": "user added"}
+
+    res = client.post(
+        "/add-user",
+        headers={"Authorization": "cs20btech11024@iith.ac.in"},
+        json=User(
+            user_id="cs20btech11014",
+            first_name="Diya",
+            last_name=None,
+            email="cs20btech11014@iith.ac.in",
+            # department="CSE",
+            user_state="Active",
+            user_type="Admin",
+        ).dict(),
+    )
+    assert res.status_code == 200
+    assert res.json() == {"detail": "user added"}
+
+    # same user_id 
+    res = client.post(
+        "/add-user",
+        headers={"Authorization": "cs20btech11024@iith.ac.in"},
+        json=User(
+            user_id="cs20btech11015",
+            first_name="Aarthi",
+            last_name="Dontha",
+            email="cs20btech11015@iith.ac.in",
+            department="CSE",
+            user_state="Active",
+            user_type="Admin",
+        ).dict(),
+    )
+    assert res.status_code == 400
+    assert res.json() == {"detail": "Cant add user"}
+
+    # different user_id and same email_id
+    res = client.post(
+        "/add-user",
+        headers={"Authorization": "cs20btech11024@iith.ac.in"},
+        json=User(
+            user_id="cs20btech11005",
+            first_name="Umesh",
+            last_name="Kalvakuntla",
+            email="cs20btech11024@iith.ac.in",
+            department="CSE",
+            user_state="Active",
+            user_type="Admin",
+        ).dict(),
+    )
+    assert res.status_code == 400
+    assert res.json() == {"detail": "Cant add user"}
+
+
+def test_update_user():
+    res = client.put(
+        "/update-user",
+        headers={"Authorization": "cs20btech11024@iith.ac.in"},
+        json=User(
+            user_id="cs20btech11014",
+            last_name="Goyal",
+        ).dict(),
+    )
+    assert res.status_code == 200
+    assert res.json() == {"detail": "User Updated"}
+
+    # updating email to already existing email
+    res = client.put(
+        "/update-user",
+        headers={"Authorization": "cs20btech11024@iith.ac.in"},
+        json=User(
+            user_id="cs20btech11015",
+            email="cs20btech11014@iith.ac.in",
+        ).dict(),
+    )
+    assert res.status_code == 400
+    assert res.json() == {"detail": "Cant update user"}
+
+
+def test_activate_deactivate_user():
+    res = client.put(
+        "/activate-deactivate-user/cs20btech11014/Inactive",
+        headers={"Authorization": "cs20btech11024@iith.ac.in"},
+    )
+    assert res.status_code == 200
+    assert res.json() == {"detail": "user state changed"}
+
+    res = client.put(
+        "/activate-deactivate-user/cs20btech11000/Active",
+        headers={"Authorization": "cs20btech11024@iith.ac.in"},
+    )
+    assert res.status_code == 201
+    assert res.json() == {"detail": "User not found"}
 
 
 def test_filter_users():
