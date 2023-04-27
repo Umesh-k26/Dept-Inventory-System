@@ -68,6 +68,13 @@ export const AddOrder = () => {
       required: false,
       label: "Other Details",
     },
+    {
+      type: "file",
+      id: "invoice",
+      required: false,
+      label: "Invoice",
+      accept: "application/pdf",
+    },
   ];
   const apiLink = "http://localhost:8000/add-order";
   return (
@@ -77,6 +84,9 @@ export const AddOrder = () => {
         apiLink={apiLink}
         method={"POST"}
         submitName={"Add Order"}
+        headers={{
+          "Content-Type": "multipart/form-data",
+        }}
       />
     </>
   );
@@ -178,6 +188,13 @@ export const UpdateOrder = () => {
       required: false,
       label: "Other Details",
     },
+    {
+      type: "file",
+      id: "invoice",
+      required: false,
+      label: "Invoice",
+      accept: "application/pdf",
+    },
   ];
   const apiLink = "http://localhost:8000/update-order";
   return (
@@ -187,6 +204,9 @@ export const UpdateOrder = () => {
         apiLink={apiLink}
         method={"PUT"}
         submitName={"Update Order"}
+        headers={{
+          "Content-Type": "multipart/form-data",
+        }}
       />
     </>
   );

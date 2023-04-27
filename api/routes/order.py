@@ -1,17 +1,12 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
+from fastapi import APIRouter
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from pypika import functions as fn
-
+import os
 from db.connect import conn
-
-from fastapi import APIRouter
-
-
 from models.db import Order_Table
 from models.responses import OrderDetails
-
 from models.email import send_email_
-
 import threading
 
 router = APIRouter()
@@ -21,11 +16,40 @@ origins = [
 ]
 
 
+def save_invoice_pdf(pdf, FILE_NAME):
+    INVOICE_PATH = "static/invoices"
+    if not os.path.exists(INVOICE_PATH):
+        os.makedirs(INVOICE_PATH)
+    file_path = os.path.join(INVOICE_PATH, FILE_NAME)
+    with open(file_path, "wb") as buffer:
+        buffer.write(pdf)
+
+
+async def get_order_dict(req: Request):
+    formData = await req.form()
+    order = dict()
+    for key in formData.keys():
+        if formData.get(key) == "":
+            order[key] = None
+            continue
+        elif key == "invoice":
+            pdf = await formData.get(key).read()
+            FILE_NAME = (
+                order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
+            )
+            if pdf:
+                save_invoice_pdf(pdf, FILE_NAME)
+        else:
+            order[key] = formData.get(key)
+    return order
+
+
 @router.post("/add-order")
-async def add_order(order: Order_Table):
+async def add_order(req: Request):
+    order = await get_order_dict(req)
     try:
         orders = Table("order_table")
-        q = Query.into("order_table").insert(*order.dict().values())
+        q = Query.into("order_table").insert(*order.values())
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
         conn.commit()
@@ -34,8 +58,8 @@ async def add_order(order: Order_Table):
             Query.from_(orders)
             .select(orders.star)
             .where(
-                (orders.purchase_order_no == order.purchase_order_no)
-                & (orders.financial_year == order.financial_year)
+                (orders.purchase_order_no == order["purchase_order_no"])
+                & (orders.financial_year == order["financial_year"])
             )
         )
         with conn.cursor() as cur:
@@ -103,21 +127,23 @@ async def delete_asset(purchase_order_no: str, financial_year: int):
 
 
 @router.put("/update-order/")
-async def update_order(order_: Order_Table):
+async def update_order(req: Request):
+    order = await get_order_dict(req)
     try:
-        order = Table("order_table")
-        q = Query.update(order).where(
-            (order.purchase_order_no == order_.purchase_order_no)
-            & (order.financial_year == order_.financial_year)
+        order_table = Table("order_table")
+        q = Query.update(order_table).where(
+            (order_table.purchase_order_no == order["purchase_order_no"])
+            & (order_table.financial_year == order["financial_year"])
         )
-        for k, v in order_.dict(exclude_none=True, exclude_defaults=True).items():
-            q = q.set(k, v)
+        for k, v in order.items():
+            if order[k] is not None:
+                q = q.set(k, v)
         q1 = (
-            Query.from_(order)
-            .select(order.star)
+            Query.from_(order_table)
+            .select(order_table.star)
             .where(
-                (order.purchase_order_no == order_.purchase_order_no)
-                & (order.financial_year == order_.financial_year)
+                (order_table.purchase_order_no == order["purchase_order_no"])
+                & (order_table.financial_year == order["financial_year"])
             )
         )
         with conn.cursor() as cur:

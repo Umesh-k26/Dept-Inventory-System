@@ -5,7 +5,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
 const FormField = ({ field }) => {
-  const { id, type, required, label, options } = field;
+  const { id, type, required, label, accept, options } = field;
 
   switch (type) {
     case "text":
@@ -142,6 +142,7 @@ const FormField = ({ field }) => {
             type={type}
             id={id}
             name={id}
+            accept={accept}
             // ref={inputRefs[id]}
             required={required}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -222,7 +223,7 @@ export const Form = ({ fields, apiLink, method, submitName, headers }) => {
       const data = await res.json();
       console.log(data);
       alert(data.detail);
-      formRef.current.reset();
+      // formRef.current.reset();
     } catch (err) {
       console.error(err);
       alert(err.message);

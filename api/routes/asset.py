@@ -2,15 +2,13 @@ from fastapi import HTTPException, Request
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from psycopg2 import Binary
 from db.connect import conn
-
+from starlette.datastructures import FormData
+from fastapi import APIRouter
+import threading
+import os
 from models.db import Asset
 from models.responses import AssetDetails
-
-from fastapi import APIRouter
-
 from models.email import send_email_
-
-import threading
 
 router = APIRouter()
 
@@ -19,33 +17,44 @@ origins = [
 ]
 
 
-@router.post("/add-asset")
-async def add_asset(req: Request):
-    formData = await req.form()
+def save_asset_pic(pic, FILE_NAME):
+    ASSETS_PATH = "static/assets/"
+    if not os.path.exists(ASSETS_PATH):
+        os.makedirs(ASSETS_PATH)
+    file_path = os.path.join(ASSETS_PATH, FILE_NAME)
+    with open(file_path, "wb") as buffer:
+        buffer.write(pic)
 
+
+async def get_asset_dict(req: Request):
+    formData = await req.form()
     asset = dict()
     for key in formData.keys():
         if formData.get(key) == "":
             asset[key] = None
+            continue
+        elif key == "picture":
+            pic = await formData.get(key).read()
+            FILE_NAME = asset["serial_no"] + ".png"
+            if pic:
+                save_asset_pic(pic, FILE_NAME)
         else:
             asset[key] = formData.get(key)
-    if asset["picture"] is not None:
-        pic = await asset["picture"].read()
-        pic = Binary(pic)
-    else:
-        pic = None
-    if "picture" in asset.keys():
-        asset.pop("picture")
+    return asset
+
+
+@router.post("/add-asset")
+async def add_asset(req: Request):
+    asset = await get_asset_dict(req)
     try:
-        asset_ = Table("asset")
+        asset_table = Table("asset")
         q = Query.into("asset").insert(
             *asset.values(),
-            pic,
         )
         q1 = (
-            Query.from_(asset_)
-            .select(asset_.star)
-            .where(asset_.serial_no == asset["serial_no"])
+            Query.from_(asset_table)
+            .select(asset_table.star)
+            .where(asset_table.serial_no == asset["serial_no"])
         )
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
@@ -116,31 +125,17 @@ def delete_asset(serial_no: str):
 
 @router.put("/update-asset/")
 async def update_asset(req: Request):
-    formData = await req.form()
-
-    asset_ = dict()
-    for key in formData.keys():
-        if formData.get(key) == "":
-            asset_[key] = None
-        else:
-            asset_[key] = formData.get(key)
-
-    if asset_["picture"] is not None:
-        pic = await asset_["picture"].read()
-        pic = Binary(pic)
-    else:
-        pic = None
-
+    asset = await get_asset_dict(req)
     try:
-        asset = Table("asset")
-        q = Query.update(asset).where(asset.serial_no == asset_["serial_no"])
-        for k, v in asset_.items():
-            if asset_[k] is not None:
+        asset_table = Table("asset")
+        q = Query.update(asset_table).where(asset_table.serial_no == asset["serial_no"])
+        for k, v in asset.items():
+            if asset[k] is not None:
                 q = q.set(k, v)
         q1 = (
-            Query.from_(asset)
-            .select(asset.star)
-            .where(asset.serial_no == asset_["serial_no"])
+            Query.from_(asset_table)
+            .select(asset_table.star)
+            .where(asset_table.serial_no == asset["serial_no"])
         )
 
         with conn.cursor() as cur:

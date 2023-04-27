@@ -51,7 +51,7 @@ CREATE TABLE asset(
     purchase_order_no VARCHAR(255),
     financial_year SMALLINT,
     asset_state VARCHAR(255),
-    picture BYTEA,
+    -- picture BYTEA,
     PRIMARY KEY (serial_no),
     FOREIGN KEY (asset_holder) REFERENCES users (user_id),
     FOREIGN KEY (purchase_order_no, financial_year) REFERENCES order_table (purchase_order_no, financial_year)
