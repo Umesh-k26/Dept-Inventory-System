@@ -10,13 +10,14 @@ import {
   DeleteAsset,
   UpdateAsset,
   DisplayAssets,
-  AssetsBarcode
+  AssetsBarcode,
 } from "components/User/Asset";
 import {
   AddBulkAsset,
   DeleteBulkAsset,
   UpdateBulkAsset,
   DisplayBulkAssets,
+  BulkAssetsBarcode,
 } from "components/User/BulkAsset";
 import {
   AddOrder,
@@ -56,6 +57,7 @@ const Admin = ({ session }) => {
       {selectedOption == 222 && <UpdateBulkAsset />}
       {selectedOption == 333 && <DeleteBulkAsset />}
       {selectedOption == 444 && <DisplayBulkAssets />}
+      {selectedOption == 555 && <BulkAssetsBarcode />}
       {selectedOption == 1111 && <AddOrder />}
       {selectedOption == 2222 && <UpdateOrder />}
       {selectedOption == 3333 && <DeleteOrder />}

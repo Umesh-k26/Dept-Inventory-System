@@ -4,175 +4,7 @@ import { useSession } from "next-auth/react";
 import Container from "./Container";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-
-
-const FormField = ({ field }) => {
-  const { id, type, required, label, accept, options } = field;
-
-  switch (type) {
-    case "text":
-    case "email":
-    case "url":
-    case "password":
-    case "number":
-      return (
-        <div>
-          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
-            {label}
-            {required && <span className="text-red-500">*</span>}
-          </label>
-          <input
-            type={type}
-            id={id}
-            name={id}
-            required={required}
-            step={field?.step}
-            min={field?.min}
-            max={field?.currentYear}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-      );
-    case "tel":
-    case "date":
-    case "time":
-    case "datetime-local":
-      return (
-        <div>
-          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
-            {label}
-            {required && <span className="text-red-500">*</span>}
-          </label>
-          <input
-            type={type}
-            id={id}
-            name={id}
-            // ref={inputRefs[id]}
-            required={required}
-            min={field?.min}
-            max={field?.currentYear}
-            // placeholder={field?.currentYear}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-      );
-    case "textarea":
-      return (
-        <div>
-          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
-            {label}
-            {required && <span className="text-red-500">*</span>}
-          </label>
-          <textarea
-            id={id}
-            name={id}
-            // ref={inputRefs[id]}
-            required={required}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          ></textarea>
-        </div>
-      );
-    case "select":
-      return (
-        <div>
-          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
-            {label}
-            {required && <span className="text-red-500">*</span>}
-          </label>
-          <select
-            id={id}
-            name={id}
-            // ref={inputRefs[id]}
-            required={required}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          >
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      );
-    case "checkbox":
-      return (
-        <div>
-          <input
-            type="checkbox"
-            id={id}
-            name={id}
-            // ref={inputRefs[id]}
-            required={required}
-            className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2"
-          />
-          <label htmlFor={id} className="text-gray-700 font-bold">
-            {label}
-            {required && <span className="text-red-500">*</span>}
-          </label>
-        </div>
-      );
-    case "radio":
-      return (
-        <div>
-          <label className="block text-gray-700 font-bold mb-2">{label}</label>
-          {options.map((option) => (
-            <div key={option.value} className="flex items-center">
-              <input
-                type="radio"
-                id={option.id}
-                name={id}
-                // ref={inputRefs[option.id]}
-                value={option.value}
-                required={required}
-                className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2"
-              />
-              <label htmlFor={option.id} className="text-gray-700 font">
-                {}
-              </label>
-            </div>
-          ))}
-        </div>
-      );
-    case "file":
-      return (
-        <div>
-          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
-            {label}
-            {required && <span className="text-red-500">*</span>}
-          </label>
-          <input
-            type={type}
-            id={id}
-            name={id}
-            accept={accept}
-            // ref={inputRefs[id]}
-            required={required}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-      );
-    case "image":
-      return (
-        <div>
-          <label htmlFor={id} className="block text-gray-700 font-bold mb-2">
-            {label}
-            {required && <span className="text-red-500">*</span>}
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            id={id}
-            name={id}
-            // ref={inputRefs[id]}
-            required={required}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-      );
-    default:
-      return null;
-  }
-};
+import { FormField } from 'components/Form'
 
 export const BarcodeGenerator = ({
   fields,
@@ -282,9 +114,9 @@ export const BarcodeGenerator = ({
       </form>
       <>
         {barcodeValues.map((barcodeValue, index) => (
-          <div>
+          <div key={barcodeValue}>
           <p>{assetDetails[index]}</p>
-          <Barcode key={barcodeValue} value={barcodeValue} />
+          <Barcode  value={barcodeValue} />
           </div>
         ))}
       </>
@@ -292,4 +124,3 @@ export const BarcodeGenerator = ({
   );
 };
 
-export default BarcodeGenerator;

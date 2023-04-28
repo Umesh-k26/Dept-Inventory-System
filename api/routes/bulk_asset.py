@@ -173,6 +173,7 @@ def filter_asset(asset_: Bulk_Asset):
             .select(
                 asset.serial_no,
                 asset.asset_name,
+                asset.asset_location,
                 asset.purchase_order_no,
                 asset.financial_year,
                 asset.quantity,

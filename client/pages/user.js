@@ -1,11 +1,17 @@
 import React from "react";
 import { getSession } from "next-auth/react";
 import { AddOrder, UpdateOrder, DisplayOrders } from "components/User/Order";
-import { AddAsset, UpdateAsset, DisplayAssets } from "components/User/Asset";
+import {
+  AddAsset,
+  UpdateAsset,
+  DisplayAssets,
+  AssetsBarcode,
+} from "components/User/Asset";
 import {
   AddBulkAsset,
   UpdateBulkAsset,
   DisplayBulkAssets,
+  BulkAssetsBarcode
 } from "components/User/BulkAsset";
 import { useState } from "react";
 import UserNav from "components/UserNav";
@@ -28,9 +34,11 @@ const User = () => {
       {selectedOption == 1 && <AddAsset />}
       {selectedOption == 2 && <UpdateAsset />}
       {selectedOption == 3 && <DisplayAssets />}
+      {selectedOption == 4 && <AssetsBarcode />}
       {selectedOption == 11 && <AddBulkAsset />}
       {selectedOption == 22 && <UpdateBulkAsset />}
       {selectedOption == 33 && <DisplayBulkAssets />}
+      {selectedOption == 44 && < BulkAssetsBarcode/>}
       {selectedOption == 111 && <AddOrder />}
       {selectedOption == 222 && <UpdateOrder />}
       {selectedOption == 333 && <DisplayOrders />}

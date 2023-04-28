@@ -29,7 +29,7 @@ export const DataTable = ({ apiLink, method, tableName }) => {
       const res = await fetch(apiLink, {
         method: method,
         headers: {
-          // Authorization: session.accessToken,
+          Authorization: session.accessToken,
           "Content-Type": "application/json",
         },
       });
@@ -38,7 +38,7 @@ export const DataTable = ({ apiLink, method, tableName }) => {
     };
     getData();
     console.log(tableData);
-  }, [apiLink, method, tableData]);
+  },[]);
 
   if (tableData) {
     console.log(tableData);

@@ -4,7 +4,7 @@ import Container from "./Container";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
-const FormField = ({ field }) => {
+export const FormField = ({ field }) => {
   const { id, type, required, label, accept, options } = field;
 
   switch (type) {

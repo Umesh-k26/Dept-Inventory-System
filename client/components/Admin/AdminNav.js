@@ -60,6 +60,10 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
         id: 444,
         name: "Display Bulk Assets",
       },
+      {
+        id: 555,
+        name: "Bulk Assets Barcode"
+      },
     ],
     order: [
       {

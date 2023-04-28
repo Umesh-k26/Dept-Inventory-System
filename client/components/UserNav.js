@@ -16,6 +16,10 @@ const UserNav = ({ handleOptionClick, selectedOption }) => {
         id: 3,
         name: "Display Assets",
       },
+      {
+        id: 4, 
+        name: "Assets Barcode",
+      },
     ],
     bulkAsset: [
       {
@@ -29,6 +33,10 @@ const UserNav = ({ handleOptionClick, selectedOption }) => {
       {
         id: 33,
         name: "Display Bulk Assets",
+      },
+      {
+        id: 44,
+        name: "Bulk Assets Barcode"
       },
     ],
     order: [

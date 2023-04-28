@@ -1,7 +1,7 @@
 import React, { useContext, useRef } from "react";
 import { Form } from "components/Form";
 import DataTable from "components/Table";
-import BarcodeGenerator from "components/Barcode";
+import { BarcodeGenerator } from "components/Barcode";
 
 export const AddAsset = () => {
   const date = new Date();
@@ -300,13 +300,14 @@ export const AssetsBarcode = () => {
 
   return (
     <>
-      <BarcodeGenerator 
+      <BarcodeGenerator
         fields={fields}
         apiLink={apiLink}
         method={"POST"}
-        submitName={"Generate Barcode"}/>
+        submitName={"Generate Barcode"}
+      />
     </>
-  )
+  );
 };
 // export const AllAssets = () => {};
 // export const AddAsset = () => {
