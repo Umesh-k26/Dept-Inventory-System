@@ -170,17 +170,20 @@ def filter_asset(asset_: Asset):
         # user = Table("users")
         asset = Table("asset")
         # order = Table("order_table")
-        print(asset_)
+        # print(type(asset_))
 
         q = (
             Query.from_(asset)
-            .select(asset.serial_no, asset.asset_name, asset.purchase_order_no, asset.financial_year, asset.asset_holder)
+            .select(
+                asset.serial_no,
+                asset.asset_name,
+                asset.purchase_order_no,
+                asset.financial_year,
+                asset.asset_holder,
+            )
             .where(
                 Criterion.all(
-                    [
-                        asset[k].ilike(f"%{v}%")
-                        for k, v in asset_.items() if v != None
-                    ]
+                    [asset[k].ilike(f"%{v}%") for k, v in asset_.items() if v != None]
                 )
             )
         )
@@ -195,14 +198,13 @@ def filter_asset(asset_: Asset):
         for i in asset_details:
             temp = ""
             for j in i:
-                if j == 'serial_no':
+                if j == "serial_no":
                     s_no.append(i[j])
                 else:
                     temp += str(j) + ": " + str(i[j]) + " , "
-            
+
             details.append(temp[:-3])
-            
-            
+
         print(asset_details)
         return [s_no, details]
         # order_list = set([i["purchase_order_no"] for i in asset_details])

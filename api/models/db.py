@@ -30,7 +30,7 @@ class Asset(BaseModel):
     purchase_order_no: str | None = None
     financial_year: int | None = None
     asset_state: str | None = None
-    picture: UploadFile | None = None
+    # picture: UploadFile | None = None
 
     @classmethod
     def __get_validators__(cls):
@@ -56,7 +56,7 @@ class Bulk_Asset(BaseModel):
     purchase_order_no: str | None = None
     financial_year: int | None = None
     asset_state: str | None = None
-    picture: UploadFile | None = None
+    # picture: UploadFile | None = None
 
 
 class Order_Table(BaseModel):
