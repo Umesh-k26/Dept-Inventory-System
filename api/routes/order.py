@@ -29,17 +29,6 @@ def save_pdf(pdf, FILE_NAME, file_type):
         buffer.write(pdf)
 
 
-async def read_pdf(FILE_NAME, file_type):
-    if file_type == "invoice":
-        PATH = "static/invoices"
-    elif file_type == "purchase_order":
-        PATH = "static/purchase_order"
-    file_path = os.path.join(PATH, FILE_NAME)
-    with open(file_path, "rb") as buffer:
-        pdf = buffer.read()
-    return pdf
-
-
 async def get_order_dict(req: Request):
     formData = await req.form()
     order = dict()
@@ -49,26 +38,29 @@ async def get_order_dict(req: Request):
             continue
         elif key == "invoice":
             invoice = await formData.get(key).read()
-            FILE_NAME = (
-                order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
-            )
-            if invoice:
-                save_pdf(invoice, FILE_NAME, key)
+            # FILE_NAME = (
+            #     order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
+            # )
+            # if invoice:
+            #     save_pdf(invoice, FILE_NAME, key)
         elif key == "purchase_order":
             purchase_order = await formData.get(key).read()
-            FILE_NAME = (
-                order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
-            )
-            if purchase_order:
-                save_pdf(purchase_order, FILE_NAME, key)
+            # FILE_NAME = (
+            #     order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
+            # )
+            # if purchase_order:
+            #     save_pdf(purchase_order, FILE_NAME, key)
         else:
             order[key] = formData.get(key)
-    return order
+    FILE_NAME = (
+            order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
+        )
+    return order, invoice, purchase_order, FILE_NAME
 
 
 @router.post("/add-order")
 async def add_order(req: Request):
-    order = await get_order_dict(req)
+    order, invoice, purchase_order, FILE_NAME = await get_order_dict(req)
     try:
         orders = Table("order_table")
         q = Query.into("order_table").insert(*order.values())
@@ -87,6 +79,10 @@ async def add_order(req: Request):
         with conn.cursor() as cur:
             cur.execute(q1.get_sql())
             result = cur.fetchall()
+        if invoice:
+            save_pdf(invoice, FILE_NAME, "invoice")
+        if purchase_order:
+            save_pdf(purchase_order, FILE_NAME, "purchase_order")
         result_str = ""
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
@@ -281,25 +277,13 @@ async def get_all_order():
     list_ = []
     data = []
     column = list(Order_Table.__fields__.keys())
-    invoice = []
-    purchase_order = []
     for i in results:
         for j in i:
             list_.append(str(i[j]))
-        invoice.append(
-            read_pdf(i["financial_year"] + "_" + i["purchase_order_no"] + ".pdf"),
-            "invoice",
-        )
-        purchase_order.append(
-            read_pdf(i["financial_year"] + "_" + i["purchase_order_no"] + ".pdf"),
-            "purchase_order",
-        )
         data.append(list_.copy())
         list_.clear()
 
     return {
         "column_name": column,
-        "values": data,
-        "invoice": invoice,
-        "purchase_order": purchase_order,
+        "values": data
     }

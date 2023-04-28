@@ -32,17 +32,17 @@ async def get_asset_dict(req: Request):
             continue
         elif key == "picture":
             pic = await formData.get(key).read()
-            FILE_NAME = asset["serial_no"] + ".png"
-            if pic:
-                save_asset_pic(pic, FILE_NAME)
+            # if pic:
+            #     save_asset_pic(pic, FILE_NAME)
         else:
             asset[key] = formData.get(key)
-    return asset
+    FILE_NAME = asset["serial_no"] + ".png"
+    return asset, pic, FILE_NAME
 
 
 @router.post("/add-bulk-asset")
 async def add_bulk_asset(req: Request):
-    asset = await get_asset_dict(req)
+    asset, pic, FILE_NAME = await get_asset_dict(req)
     try:
         asset_ = Table("bulk_asset")
         q = Query.into("bulk_asset").insert(
@@ -61,6 +61,8 @@ async def add_bulk_asset(req: Request):
             cur.execute(q1.get_sql())
             result = cur.fetchall()
 
+        if pic:
+            save_asset_pic(pic, FILE_NAME)
         result_str = ""
         for i in result[0]:
             if i != "picture":

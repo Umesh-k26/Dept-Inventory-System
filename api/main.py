@@ -28,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.mount("/files", StaticFiles(directory="static"), name="static")
+app.mount("/files", StaticFiles(directory="static"), name="static")
 
 
 # scheduling the warranty

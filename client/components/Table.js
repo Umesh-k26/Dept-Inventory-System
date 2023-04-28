@@ -7,7 +7,7 @@ const options = {
   download: true,
   print: true,
   selectableRows: "multiple",
-  // responsive: "vertical",
+  responsive: "simple",
   // overFlowX: "auto",
   selectableRows: "none",
   downloadOptions: {
@@ -42,26 +42,81 @@ export const DataTable = ({ apiLink, method, tableName }) => {
 
   if (tableData) {
     console.log(tableData);
+    
     for (let i = 0; i < tableData.column_name.length; i++) {
-      columns.push({
-        name: tableData.column_name[i],
-        options: {
-          filter: true,
-          sort: true,
-          setCellProps: (value) => {
-            return {
-              style: {
-                whiteSpace: "normal",
-                // height: "auto",
-                innerWidth: "auto",
-                outerWidth: "auto",
-                overFlowX: "hidden",
-                wordwrap: true,
+      if(tableData.column_name[i] == "serial_no")
+      {
+        if(tableName == "All Assets")
+        {
+          columns.push({
+            name: tableData.column_name[i],
+              options: {
+                filter: true,
+                sort: true,
+                customBodyRender: (value) => (
+                  <a href={"http://localhost:8000/files/assets/"+ String(value) + '.png'} target="_blank"> {value} </a>
+                ),
+                setCellProps: (value) => {
+                  return {
+                    style: {
+                      whiteSpace: "normal",
+                      // height: "auto",
+                      innerWidth: "auto",
+                      outerWidth: "auto",
+                      overFlowX: "hidden",
+                      wordwrap: true,
+                    },
+                  };
+                },
               },
-            };
+          })
+        }
+        else if(tableName == "All Bulk Assets"){
+          columns.push({
+            name: tableData.column_name[i],
+              options: {
+                filter: true,
+                sort: true,
+                customBodyRender: (value) => (
+                  <a href={"http://localhost:8000/files/bulk_assets/"+ String(value) + '.png'} target="_blank"> {value} </a>
+                ),
+                setCellProps: (value) => {
+                  return {
+                    style: {
+                      whiteSpace: "normal",
+                      // height: "auto",
+                      innerWidth: "auto",
+                      outerWidth: "auto",
+                      overFlowX: "hidden",
+                      wordwrap: true,
+                    },
+                  };
+                },
+              },
+          })
+        }
+      }
+      else{
+        columns.push({
+          name: tableData.column_name[i],
+          options: {
+            filter: true,
+            sort: true,
+            setCellProps: (value) => {
+              return {
+                style: {
+                  whiteSpace: "normal",
+                  // height: "auto",
+                  innerWidth: "auto",
+                  outerWidth: "auto",
+                  overFlowX: "hidden",
+                  wordwrap: true,
+                },
+              };
+            },
           },
-        },
-      });
+        });
+      }
     }
 
     return (
