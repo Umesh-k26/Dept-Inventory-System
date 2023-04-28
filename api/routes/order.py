@@ -16,13 +16,28 @@ origins = [
 ]
 
 
-def save_invoice_pdf(pdf, FILE_NAME):
-    INVOICE_PATH = "static/invoices"
-    if not os.path.exists(INVOICE_PATH):
-        os.makedirs(INVOICE_PATH)
-    file_path = os.path.join(INVOICE_PATH, FILE_NAME)
+def save_pdf(pdf, FILE_NAME, file_type):
+    if file_type == "invoice":
+        PATH = "static/invoices"
+    elif file_type == "purchase_order":
+        PATH = "static/purchase_order"
+
+    if not os.path.exists(PATH):
+        os.makedirs(PATH)
+    file_path = os.path.join(PATH, FILE_NAME)
     with open(file_path, "wb") as buffer:
         buffer.write(pdf)
+
+
+async def read_pdf(FILE_NAME, file_type):
+    if file_type == "invoice":
+        PATH = "static/invoices"
+    elif file_type == "purchase_order":
+        PATH = "static/purchase_order"
+    file_path = os.path.join(PATH, FILE_NAME)
+    with open(file_path, "rb") as buffer:
+        pdf = buffer.read()
+    return pdf
 
 
 async def get_order_dict(req: Request):
@@ -33,12 +48,19 @@ async def get_order_dict(req: Request):
             order[key] = None
             continue
         elif key == "invoice":
-            pdf = await formData.get(key).read()
+            invoice = await formData.get(key).read()
             FILE_NAME = (
                 order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
             )
-            if pdf:
-                save_invoice_pdf(pdf, FILE_NAME)
+            if invoice:
+                save_pdf(invoice, FILE_NAME, key)
+        elif key == "purchase_order":
+            purchase_order = await formData.get(key).read()
+            FILE_NAME = (
+                order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
+            )
+            if purchase_order:
+                save_pdf(purchase_order, FILE_NAME, key)
         else:
             order[key] = formData.get(key)
     return order
@@ -75,12 +97,12 @@ async def add_order(req: Request):
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
+        return {"detail": "Order Added Successfully"}
 
     except Exception as e:
         print(e)
         conn.rollback()
-        raise HTTPException(400, "Cant add order")
-    return {"detail": "order added"}
+        raise HTTPException(400, str(e).split("\n")[1])
 
 
 @router.delete("/delete-order/{purchase_order_no}/{financial_year}")
@@ -108,6 +130,7 @@ async def delete_asset(purchase_order_no: str, financial_year: int):
             result = cur.fetchall()
             cur.execute(q.get_sql())
         conn.commit()
+        # raise an exception when the order does not exists.
 
         result_str = ""
         for i in result[0]:
@@ -119,11 +142,11 @@ async def delete_asset(purchase_order_no: str, financial_year: int):
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
+        return {"detail": "Order Deleted Successfully"}
 
     except Exception as e:
         print(e)
-        raise HTTPException(201, "Order not found")
-    return {"detail": "order deleted"}
+        raise HTTPException(201, str(e).split("\n")[1])
 
 
 @router.put("/update-order/")
@@ -152,6 +175,7 @@ async def update_order(req: Request):
             result = cur.fetchall()
         conn.commit()
 
+        # raise an exception when the order does not exists.
         result_str = ""
         for i in result[0]:
             result_str += i + " : " + str(result[0][i]) + "<br>"
@@ -162,16 +186,16 @@ async def update_order(req: Request):
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
+        return {"detail": "Order Updated Successfully"}
 
     except Exception as e:
         print(e)
         conn.rollback()
-        raise HTTPException(400, "Cant update order")
-    return {"detail": "Order Updated"}
+        raise HTTPException(400, str(e).split("\n")[1])
 
 
 @router.post("/get-order/")
-async def get_order(order_: Order_Table) -> list[OrderDetails]:
+async def get_order(order_: Order_Table):
     try:
         order = Table("order_table")
         user = Table("users")
@@ -240,10 +264,11 @@ async def get_order(order_: Order_Table) -> list[OrderDetails]:
                 if i["indentor"] == j["user_id"]:
                     i.update(j)
         conn.commit()
+        return [OrderDetails.parse_obj(_order) for _order in order_details]
+
     except Exception as e:
         print(e)
-        raise HTTPException(201, "Order not found")
-    return [OrderDetails.parse_obj(_order) for _order in order_details]
+        raise HTTPException(201, str(e).split("\n")[1])
 
 
 @router.get("/get-all-order")
@@ -255,23 +280,26 @@ async def get_all_order():
         results = cur.fetchall()
     list_ = []
     data = []
-    column = [
-        "purchase_order_no",
-        "order_date",
-        "indentor",
-        "firm_name",
-        "financial_year",
-        "final_procurement_date",
-        "invoice_no",
-        "invoice_date",
-        "total_price",
-        "source_of_fund",
-        "fund_info",
-        "other_details",
-    ]
+    column = list(Order_Table.__fields__.keys())
+    invoice = []
+    purchase_order = []
     for i in results:
         for j in i:
             list_.append(str(i[j]))
+        invoice.append(
+            read_pdf(i["financial_year"] + "_" + i["purchase_order_no"] + ".pdf"),
+            "invoice",
+        )
+        purchase_order.append(
+            read_pdf(i["financial_year"] + "_" + i["purchase_order_no"] + ".pdf"),
+            "purchase_order",
+        )
         data.append(list_.copy())
         list_.clear()
-    return {"column_name": column, "values": data}
+
+    return {
+        "column_name": column,
+        "values": data,
+        "invoice": invoice,
+        "purchase_order": purchase_order,
+    }

@@ -1,7 +1,8 @@
 from fastapi import Depends, FastAPI, UploadFile, File
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
-from utils.auth import get_email
+from utils.auth import get_user_details
 from utils.configs import Config
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -13,8 +14,8 @@ from utils.warranty import warranty_
 from db.connect import conn
 import uvicorn
 
-app = FastAPI()
-
+app = FastAPI(dependencies=[Depends(get_user_details)])
+# app = FastAPI()
 origins = [
     "http://localhost:3000",
 ]
@@ -26,6 +27,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/files", StaticFiles(directory="static"), name="static")
 
 
 # scheduling the warranty
@@ -42,19 +45,19 @@ def startup_event():
 
 
 @app.get("/get-role/")
-async def get_test(details: Annotated[dict, Depends(get_email)]):
+async def get_test(details: Annotated[dict, Depends(get_user_details)]):
     return details
 
 
-@app.post("/uploadfile/")
-async def upload_file(file: UploadFile = File(...)):
-    try:
-        contents = await file.read()
-        # Process the file contents
-        return {"filename": file.filename, "status": "success"}
-    except Exception as e:
-        print(e)
-        return {"filename": file.filename, "status": "error", "message": str(e)}
+# @app.post("/uploadfile/")
+# async def upload_file(file: UploadFile = File(...)):
+#     try:
+#         contents = await file.read()
+#         # Process the file contents
+#         return {"filename": file.filename, "status": "success"}
+#     except Exception as e:
+#         print(e)
+#         return {"filename": file.filename, "status": "error", "message": str(e)}
 
 
 # USER details

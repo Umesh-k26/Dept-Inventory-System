@@ -1,17 +1,9 @@
-from fastapi import Depends, HTTPException
-from typing import Annotated
-from utils.auth import get_email
-from utils.configs import Config
+from fastapi import HTTPException
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from db.connect import conn
-from fastapi import BackgroundTasks
 from models.db import User
 from fastapi import APIRouter
-
 from models.email import send_email_
-
-import threading
-
 import threading
 
 router = APIRouter()
@@ -20,11 +12,9 @@ origins = [
     "http://localhost:3000",
 ]
 
-# delete user has to be modified!!
-
 
 @router.post("/add-user")
-def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
+def add_user(user: User):
     try:
         users = Table("users")
         q = Query.into(users).insert(*user.dict().values())
@@ -48,18 +38,16 @@ def add_user(user: User, email_: Annotated[str, Depends(get_email)]):
         )
         subject = "User Added"
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
+        return {"detail": "User Added Successfully"}
 
     except Exception as e:
         print(e)
         conn.rollback()
-        raise HTTPException(400, "Cant add user")
-    return {"detail": "user added"}
+        raise HTTPException(400, str(e).split("\n")[1])
 
 
 @router.put("/activate-deactivate-user/{user_id}/{user_state}")
-def activate_deactivate_user(
-    user_id: str, user_state: str, email_: Annotated[str, Depends(get_email)]
-):
+def activate_deactivate_user(user_id: str, user_state: str):
     try:
         users = Table("users")
         q1 = Query.from_(users).select(users.star).where(users.user_id == user_id)
@@ -85,15 +73,15 @@ def activate_deactivate_user(
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
+        return {"detail": "User State Changed Successfully"}
 
     except Exception as e:
         print(e)
-        raise HTTPException(201, "User not found")
-    return {"detail": "user state changed"}
+        raise HTTPException(201, "DETAIL: User does not exist")
 
 
 @router.put("/update-user/")
-def update_user(user: User, email_: Annotated[str, Depends(get_email)]):
+def update_user(user: User):
     try:
         users = Table("users")
         q = Query.update(users).where(users.user_id == user.user_id)
@@ -117,12 +105,12 @@ def update_user(user: User, email_: Annotated[str, Depends(get_email)]):
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
+        return {"detail": "User Updated Successfully"}
 
     except Exception as e:
         print(e)
         conn.rollback()
-        raise HTTPException(400, "Cant update user")
-    return {"detail": "User Updated"}
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.get("/get-user/{user_id}")
@@ -133,14 +121,15 @@ def get_user(user_id: str) -> User:
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             user = cur.fetchall()
+        return User.parse_obj(user[0])
+
     except Exception as e:
         print(e)
-        raise HTTPException(201, "User not found")
-    return User.parse_obj(user[0])
+        raise HTTPException(201, str(e).split("\n")[1])
 
 
 @router.post("/get-user")
-def filter_user(user: User, email_: Annotated[str, Depends(get_email)]) -> list[User]:
+def filter_user(user: User) -> list[User]:
     try:
         users = Table("users")
         q = (
@@ -160,10 +149,11 @@ def filter_user(user: User, email_: Annotated[str, Depends(get_email)]) -> list[
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             results = cur.fetchall()
+        return [User.parse_obj(user_) for user_ in results]
+
     except Exception as e:
         print(e)
-        raise HTTPException(201, "filters not found")
-    return [User.parse_obj(user_) for user_ in results]
+        raise HTTPException(201, str(e).split("\n")[1])
 
 
 @router.get("/get-all-user")
@@ -175,15 +165,7 @@ def get_all_user():
         results = cur.fetchall()
     list_ = []
     data = []
-    columns = [
-        "user_id",
-        "first_name",
-        "last_name",
-        "email",
-        "user_type",
-        "department",
-        "user_state",
-    ]
+    columns = list(User.__fields__.keys())
     for i in results:
         for j in i:
             list_.append(i[j])

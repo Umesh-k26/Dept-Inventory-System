@@ -75,6 +75,13 @@ export const AddOrder = () => {
       label: "Invoice",
       accept: "application/pdf",
     },
+    {
+      type: "file",
+      id: "purchase_order",
+      required: false,
+      label: "Purchase Order",
+      accept: "application/pdf",
+    },
   ];
   const apiLink = "http://localhost:8000/add-order";
   return (

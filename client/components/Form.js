@@ -125,7 +125,7 @@ const FormField = ({ field }) => {
                 className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2"
               />
               <label htmlFor={option.id} className="text-gray-700 font">
-                {}
+                { }
               </label>
             </div>
           ))}
@@ -223,7 +223,7 @@ export const Form = ({ fields, apiLink, method, submitName, headers }) => {
       const data = await res.json();
       console.log(data);
       alert(data.detail);
-      formRef.current.reset();
+      // formRef.current.reset();
     } catch (err) {
       console.error(err);
       alert(err.message);
@@ -274,4 +274,4 @@ export const DeleteForm = ({
   method,
   submitName,
   headers,
-}) => {};
+}) => { };

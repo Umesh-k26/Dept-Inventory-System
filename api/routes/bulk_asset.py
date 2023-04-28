@@ -1,17 +1,11 @@
 from fastapi import HTTPException, Request
 from pypika import PostgreSQLQuery as Query, Table, Criterion
-from psycopg2 import Binary
-
 from db.connect import conn
-
-from models.db import Bulk_Asset
-from models.responses import AssetDetails
-
 from fastapi import APIRouter
-
-from models.email import send_email_
-
 import threading
+import os
+from models.db import Bulk_Asset
+from models.email import send_email_
 
 router = APIRouter()
 
@@ -20,29 +14,39 @@ origins = [
 ]
 
 
-@router.post("/add-bulk-asset")
-async def add_bulk_asset(req: Request):
-    formData = await req.form()
+def save_asset_pic(pic, FILE_NAME):
+    ASSETS_PATH = "static/bulk_assets/"
+    if not os.path.exists(ASSETS_PATH):
+        os.makedirs(ASSETS_PATH)
+    file_path = os.path.join(ASSETS_PATH, FILE_NAME)
+    with open(file_path, "wb") as buffer:
+        buffer.write(pic)
 
+
+async def get_asset_dict(req: Request):
+    formData = await req.form()
     asset = dict()
     for key in formData.keys():
         if formData.get(key) == "":
             asset[key] = None
+            continue
+        elif key == "picture":
+            pic = await formData.get(key).read()
+            FILE_NAME = asset["serial_no"] + ".png"
+            if pic:
+                save_asset_pic(pic, FILE_NAME)
         else:
             asset[key] = formData.get(key)
+    return asset
 
-    if asset["picture"] is not None:
-        pic = await asset["picture"].read()
-        pic = Binary(pic)
-    else:
-        pic = None
-    if "picture" in asset.keys():
-        asset.pop("picture")
+
+@router.post("/add-bulk-asset")
+async def add_bulk_asset(req: Request):
+    asset = await get_asset_dict(req)
     try:
         asset_ = Table("bulk_asset")
         q = Query.into("bulk_asset").insert(
             *asset.values(),
-            pic,
         )
         q1 = (
             Query.from_(asset_)
@@ -68,12 +72,12 @@ async def add_bulk_asset(req: Request):
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
+        return {"detail": "Asset added Successfully"}
 
     except Exception as e:
         print(e)
         conn.rollback()
-        raise HTTPException(e)
-    return {"detail": "Asset added"}
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.delete("/delete-bulk-asset/{serial_no}/{asset_location}")
@@ -113,43 +117,26 @@ async def delete_bulk_asset(serial_no: str, asset_location: str):
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
+        return {"detail": "Asset deleted Successfully"}
 
     except Exception as e:
         print(e)
-        raise HTTPException(201, "Asset not found")
-    return {"detail": "Asset deleted"}
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.put("/update-bulk-asset/")
 async def update_bulk_asset(req: Request):
-    formData = await req.form()
-
-    asset_ = dict()
-    for key in formData.keys():
-        if formData.get(key) == "":
-            asset_[key] = None
-        else:
-            asset_[key] = formData.get(key)
-
-    if asset_["picture"] is not None:
-        pic = await asset_["picture"].read()
-        pic = Binary(pic)
-    else:
-        pic = None
-    if "picture" in asset_.keys():
-        asset_.pop("picture")
+    asset = await get_asset_dict(req)
     try:
-        asset = Table("bulk_asset")
-        q = Query.update(asset).where(asset.serial_no == asset_["serial_no"])
-        for k, v in asset_.items():
-            if asset_[k] is not None:
+        asset_table = Table("bulk_asset")
+        q = Query.update(asset_table).where(asset_table.serial_no == asset["serial_no"])
+        for k, v in asset.items():
+            if asset[k] is not None:
                 q = q.set(k, v)
-        if pic != None:
-            q = q.set("picture", pic)
         q1 = (
-            Query.from_(asset)
-            .select(asset.star)
-            .where(asset.serial_no == asset_["serial_no"])
+            Query.from_(asset_table)
+            .select(asset_table.star)
+            .where(asset_table.serial_no == asset["serial_no"])
         )
 
         with conn.cursor() as cur:
@@ -160,8 +147,7 @@ async def update_bulk_asset(req: Request):
 
         result_str = ""
         for i in result[0]:
-            if i != "picture" or i != "barcode":
-                result_str += i + " : " + str(result[0][i]) + "<br>"
+            result_str += i + " : " + str(result[0][i]) + "<br>"
 
         subject = "Asset Updated"
         body = (
@@ -169,30 +155,34 @@ async def update_bulk_asset(req: Request):
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
+        return {"detail": "Asset Updated Successfully"}
 
     except Exception as e:
         print(e)
         conn.rollback()
-        raise HTTPException(400, "Cant update asset")
-    return {"detail": "Asset Updated"}
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.post("/get-bulk-asset")
-def filter_asset(asset_: Bulk_Asset) -> list[AssetDetails]:
+def filter_asset(asset_: Bulk_Asset):
     try:
         asset = Table("bulk_asset")
-        order = Table("order_table")
 
         q = (
             Query.from_(asset)
-            .select(asset.star)
+            .select(
+                asset.serial_no,
+                asset.asset_name,
+                asset.purchase_order_no,
+                asset.financial_year,
+                asset.quantity,
+            )
             .where(
                 Criterion.all(
                     [
                         asset[k].ilike(f"%{v}%")
-                        for k, v in asset_.dict(
-                            exclude_none=True, exclude_defaults=True, exclude_unset=True
-                        ).items()
+                        for k, v in asset_.dict().items()
+                        if v != None
                     ]
                 )
             )
@@ -200,63 +190,36 @@ def filter_asset(asset_: Bulk_Asset) -> list[AssetDetails]:
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             asset_details = cur.fetchall()
-        # order_list = set([i["purchase_order_no"] for i in asset_details])
-        # q1 = (
-        #     Query.from_(order)
-        #     .select(order.star)
-        #     .where(Criterion.any(order.purchase_order_no == i for i in order_list))
-        # )
-        # with conn.cursor() as cur:
-        #     cur.execute(q1.get_sql())
-        #     order_details = cur.fetchall()
-        # for i in asset_details:
-        #     for j in order_details:
-        #         if i["purchase_order_no"] == j["purchase_order_no"]:
-        #             i.update(j)
-        return asset_details
+
+        s_no = []
+        details = []
+
+        for i in asset_details:
+            temp = ""
+            for j in i:
+                if j == "serial_no":
+                    s_no.append(i[j])
+                else:
+                    temp += str(j) + ": " + str(i[j]) + " , "
+
+            details.append(temp[:-3])
+        return [s_no, details]
+
     except Exception as e:
         print(e)
-        raise HTTPException(201, "filters not found")
-
-    # return [AssetDetails.parse_obj(asset) for asset in asset_details]
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.get("/get-all-bulk-asset")
 async def get_all_bulk_asset():
     asset = Table("bulk_asset")
-    q = Query.from_(asset).select(
-        asset.serial_no,
-        asset.asset_name,
-        asset.model,
-        asset.asset_make,
-        asset.department,
-        asset.asset_location,
-        asset.asset_type,
-        asset.entry_date,
-        asset.quantity,
-        asset.purchase_order_no,
-        asset.financial_year,
-        asset.asset_state,
-    )
+    q = Query.from_(asset).select(asset.star)
     with conn.cursor() as cur:
         cur.execute(q.get_sql())
         results = cur.fetchall()
     list_ = []
     data = []
-    columns = [
-        "serial_no",
-        "asset_name",
-        "model",
-        "asset_make",
-        "department",
-        "asset_location",
-        "asset_type",
-        "entry_date",
-        "quantity",
-        "purchase_order_no",
-        "financial_year",
-        "asset_state",
-    ]
+    columns = list(Bulk_Asset.__fields__.keys())
     for i in results:
         for j in i:
             list_.append(str(i[j]))

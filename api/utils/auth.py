@@ -35,14 +35,16 @@ async def db_authorize(email):
     return details
 
 
-async def get_email(request: Request):
+async def get_user_details(request: Request):
     try:
+        print("doing auth...")
         token = request.headers.get("Authorization")
         idinfo = id_token.verify_oauth2_token(
             token, requests.Request(), Config.GOOGLE_CLIENT_ID
         )
         email = idinfo["email"]
         return await db_authorize(email)
+        # return True
 
     except HTTPException as e:
         raise e
@@ -50,6 +52,6 @@ async def get_email(request: Request):
         raise HTTPException(404, detail="We are not able to authenticate you.")
 
 
-async def override_get_email(request: Request):
+async def override_get_user_details(request: Request):
     email = request.headers.get("Authorization")
     return email
