@@ -209,9 +209,26 @@ export const UpdateAsset = () => {
 export const DisplayAssets = () => {
   const apiLink = "http://localhost:8000/get-all-asset";
 
+  const customRender = {
+    serial_no: (value) => (
+      <a
+        href={`http://localhost:8000/files/assets/${value}.png`}
+        target="_blank"
+      >
+        {" "}
+        {value}{" "}
+      </a>
+    ),
+  };
+
   return (
     <>
-      <DataTable apiLink={apiLink} method={"GET"} tableName={"All Assets"} />
+      <DataTable
+        apiLink={apiLink}
+        method={"GET"}
+        tableName={"All Assets"}
+        customRender={customRender}
+      />
     </>
   );
 };

@@ -193,12 +193,27 @@ export const UpdateBulkAsset = () => {
 export const DisplayBulkAssets = () => {
   const apiLink = "http://localhost:8000/get-all-bulk-asset";
 
+  const customRender = {
+    serial_no: (value) => (
+      <a
+        href={
+          "http://localhost:8000/files/bulk_assets/" + String(value) + ".png"
+        }
+        target="_blank"
+      >
+        {" "}
+        {value}{" "}
+      </a>
+    ),
+  };
+
   return (
     <>
       <DataTable
         apiLink={apiLink}
         method={"GET"}
         tableName={"All Bulk Assets"}
+        customRender={customRender}
       />
     </>
   );

@@ -202,6 +202,13 @@ export const UpdateOrder = () => {
       label: "Invoice",
       accept: "application/pdf",
     },
+    {
+      type: "file",
+      id: "purchase_order",
+      required: false,
+      label: "Purchase Order",
+      accept: "application/pdf",
+    },
   ];
   const apiLink = "http://localhost:8000/update-order";
   return (
@@ -221,10 +228,41 @@ export const UpdateOrder = () => {
 
 export const DisplayOrders = () => {
   const apiLink = "http://localhost:8000/get-all-order";
-
+  const customRender = {
+    purchase_order_no: (value, tableMeta, updateValue) => {
+      const financialYear = tableMeta.rowData[4];
+      return (
+        <a
+          href={`http://localhost:8000/files/purchase_order/${financialYear}_${value}.pdf`}
+          target="_blank"
+        >
+          {" "}
+          {value}{" "}
+        </a>
+      );
+    },
+    invoice_no: (value, tableMeta, updateValue) => {
+      const purchaseOrderNo = tableMeta.rowData[0];
+      const financialYear = tableMeta.rowData[4];
+      return (
+        <a
+          href={`http://localhost:8000/files/invoices/${financialYear}_${purchaseOrderNo}.pdf`}
+          target="_blank"
+        >
+          {" "}
+          {value}{" "}
+        </a>
+      );
+    },
+  };
   return (
     <>
-      <DataTable apiLink={apiLink} method={"GET"} tableName={"All Orders"} />
+      <DataTable
+        apiLink={apiLink}
+        method={"GET"}
+        tableName={"All Orders"}
+        customRender={customRender}
+      />
     </>
   );
 };
