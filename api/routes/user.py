@@ -43,7 +43,7 @@ def add_user(user: User):
     except Exception as e:
         print(e)
         conn.rollback()
-        raise HTTPException(400, str(e).split("\n")[1])
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.put("/activate-deactivate-user/{user_id}/{user_state}")
@@ -77,7 +77,7 @@ def activate_deactivate_user(user_id: str, user_state: str):
 
     except Exception as e:
         print(e)
-        raise HTTPException(201, "DETAIL: User does not exist")
+        raise HTTPException(404, "DETAIL: User Does Not Exist")
 
 
 @router.put("/update-user/")
@@ -125,7 +125,7 @@ def get_user(user_id: str) -> User:
 
     except Exception as e:
         print(e)
-        raise HTTPException(201, str(e).split("\n")[1])
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.post("/get-user")
@@ -153,7 +153,7 @@ def filter_user(user: User) -> list[User]:
 
     except Exception as e:
         print(e)
-        raise HTTPException(201, str(e).split("\n")[1])
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.get("/get-all-user")

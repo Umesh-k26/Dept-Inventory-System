@@ -32,24 +32,16 @@ def save_pdf(pdf, FILE_NAME, file_type):
 async def get_order_dict(req: Request):
     formData = await req.form()
     order = dict()
+    invoice = None
+    purchase_order = None
     for key in formData.keys():
         if formData.get(key) == "":
             order[key] = None
             continue
         elif key == "invoice":
             invoice = await formData.get(key).read()
-            # FILE_NAME = (
-            #     order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
-            # )
-            # if invoice:
-            #     save_pdf(invoice, FILE_NAME, key)
         elif key == "purchase_order":
             purchase_order = await formData.get(key).read()
-            # FILE_NAME = (
-            #     order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
-            # )
-            # if purchase_order:
-            #     save_pdf(purchase_order, FILE_NAME, key)
         else:
             order[key] = formData.get(key)
     FILE_NAME = order["financial_year"] + "_" + order["purchase_order_no"] + ".pdf"
@@ -76,14 +68,16 @@ async def add_order(req: Request):
         )
         with conn.cursor() as cur:
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
+
         if invoice:
             save_pdf(invoice, FILE_NAME, "invoice")
         if purchase_order:
             save_pdf(purchase_order, FILE_NAME, "purchase_order")
+
         result_str = ""
-        for i in result[0]:
-            result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "Order Added"
         body = (
@@ -96,7 +90,7 @@ async def add_order(req: Request):
     except Exception as e:
         print(e)
         conn.rollback()
-        raise HTTPException(400, str(e).split("\n")[1])
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.delete("/delete-order/{purchase_order_no}/{financial_year}")
@@ -121,14 +115,16 @@ async def delete_asset(purchase_order_no: str, financial_year: int):
         )
         with conn.cursor() as cur:
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
             cur.execute(q.get_sql())
         conn.commit()
-        # raise an exception when the order does not exists.
+
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: Order Does Not Exist"}
 
         result_str = ""
-        for i in result[0]:
-            result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "Order Deleted"
         body = (
@@ -140,7 +136,7 @@ async def delete_asset(purchase_order_no: str, financial_year: int):
 
     except Exception as e:
         print(e)
-        raise HTTPException(201, str(e).split("\n")[1])
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.put("/update-order/")
@@ -168,16 +164,20 @@ async def update_order(req: Request):
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
         conn.commit()
+
         if invoice:
             save_pdf(invoice, FILE_NAME, "invoice")
         if purchase_order:
             save_pdf(purchase_order, FILE_NAME, "purchase_order")
-        # raise an exception when the order does not exists.
+
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: Order Does Not Exist"}
+
         result_str = ""
-        for i in result[0]:
-            result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "Order Updated"
         body = (
@@ -190,7 +190,7 @@ async def update_order(req: Request):
     except Exception as e:
         print(e)
         conn.rollback()
-        raise HTTPException(400, str(e).split("\n"))
+        raise HTTPException(404, str(e).split("\n"))
 
 
 @router.post("/get-order/")
@@ -267,7 +267,7 @@ async def get_order(order_: Order_Table):
 
     except Exception as e:
         print(e)
-        raise HTTPException(201, str(e).split("\n")[1])
+        raise HTTPException(404, str(e).split("\n")[1])
 
 
 @router.get("/get-all-order")

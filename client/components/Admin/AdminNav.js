@@ -14,7 +14,7 @@ const AdminNav = ({ handleOptionClick, selectedOption }) => {
       },
       {
         id: 3,
-        name: "Activate/Deactivate User",
+        name: "Activate/ Deactivate User",
       },
       {
         id: 4,

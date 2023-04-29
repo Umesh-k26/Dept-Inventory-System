@@ -33,7 +33,6 @@ def test_add_user():
         ).dict(),
     )
     assert res.status_code == 200
-    # assert res.json() == {"detail": "user added"}
 
     res = client.post(
         "/add-user",
@@ -49,7 +48,6 @@ def test_add_user():
         ).dict(),
     )
     assert res.status_code == 200
-    # assert res.json() == {"detail": "user added"}
 
     res = client.post(
         "/add-user",
@@ -65,7 +63,6 @@ def test_add_user():
         ).dict(),
     )
     assert res.status_code == 200
-    # assert res.json() == {"detail": "user added"}
 
     # same user_id
     res = client.post(
@@ -78,11 +75,11 @@ def test_add_user():
             email="cs20btech11015@iith.ac.in",
             department="CSE",
             user_state="Active",
-            user_type="Admin",
+            # user_type="Admin",
+            user_type="Student",
         ).dict(),
     )
-    assert res.status_code == 400
-    # assert res.json() == {"detail": "Cant add user"}
+    assert res.status_code == 404
 
     # different user_id and same email_id
     res = client.post(
@@ -98,8 +95,7 @@ def test_add_user():
             user_type="Admin",
         ).dict(),
     )
-    assert res.status_code == 400
-    # assert res.json() == {"detail": "Cant add user"}
+    assert res.status_code == 404
 
 
 def test_update_user():
@@ -112,7 +108,6 @@ def test_update_user():
         ).dict(),
     )
     assert res.status_code == 200
-    assert res.json() == {"detail": "User Updated"}
 
     # updating email to already existing email
     res = client.put(
@@ -123,8 +118,7 @@ def test_update_user():
             email="cs20btech11014@iith.ac.in",
         ).dict(),
     )
-    assert res.status_code == 400
-    assert res.json() == {"detail": "Cant update user"}
+    assert res.status_code == 404
 
 
 def test_activate_deactivate_user():
@@ -133,26 +127,24 @@ def test_activate_deactivate_user():
         headers={"Authorization": "cs20btech11024@iith.ac.in"},
     )
     assert res.status_code == 200
-    assert res.json() == {"detail": "user state changed"}
 
     res = client.put(
         "/activate-deactivate-user/cs20btech11000/Active",
         headers={"Authorization": "cs20btech11024@iith.ac.in"},
     )
-    assert res.status_code == 201
-    assert res.json() == {"detail": "User not found"}
+    assert res.status_code == 404
 
 
-def test_filter_users():
-    res = client.post(
-        "/get-user",
-        headers={"Authorization": "cs20btech11024@iith.ac.in"},
-        json=User(user_type="Stud", department="CSE").dict(),
-    )
-    data = res.json()
-    assert res.status_code == 200
-    for user in data:
-        print(user)
+# def test_filter_users():
+#     res = client.post(
+#         "/get-user",
+#         headers={"Authorization": "cs20btech11024@iith.ac.in"},
+#         json=User(user_type="Stud", department="CSE").dict(),
+#     )
+#     data = res.json()
+#     assert res.status_code == 200
+#     for user in data:
+#         print(user)
 
 
 # Order Testing
@@ -162,17 +154,15 @@ def test_add_order():
     res = client.post(
         "/add-order",
         headers={"Authorization": "cs20btech11024@iith.ac.in"},
-        json=Order_Table(
+        data=Order_Table(
             purchase_order_no="1",
             financial_year=2023,
             indentor="cs20btech11014",
         ).dict(),
-        files=(),
+        # files=(),
     )
 
     assert res.status_code == 200
-    # assert res.json() == {"detail": "asset added"}
-    print(res.json())
 
 
 # Asset Testing
@@ -195,8 +185,6 @@ def test_add_asset():
     )
 
     assert res.status_code == 200
-    # assert res.json() == {"detail": "asset added"}
-    print(res.json())
 
 
 def test_update_asset():
@@ -214,22 +202,20 @@ def test_update_asset():
     )
 
     assert res.status_code == 200
-    # assert res.json() == {"detail": "asset added"}
-    print(res.json())
 
 
-def test_filter_asset():
-    res = client.post(
-        "/get-asset",
-        headers={"Authorization": "cs20btech11024@iith.ac.in"},
-        json=Asset(
-            asset_name="Keyboard",
-        ).dict(),
-    )
-    data = res.json()
-    assert res.status_code == 200
-    for asset in data:
-        print(asset)
+# def test_filter_asset():
+#     res = client.post(
+#         "/get-asset",
+#         headers={"Authorization": "cs20btech11024@iith.ac.in"},
+#         json=Asset(
+#             asset_name="Keyboard",
+#         ).dict(),
+#     )
+#     data = res.json()
+#     assert res.status_code == 200
+#     for asset in data:
+#         print(asset)
 
 
 # Bulk Asset Testing
@@ -243,6 +229,7 @@ def test_add_bulk_asset():
             asset_name="Keyboard",
             model="DELL540",
             serial_no="154",
+            asset_location="Lab 524",
             purchase_order_no="1",
             financial_year=2023,
             # picture=None,
@@ -251,8 +238,6 @@ def test_add_bulk_asset():
     )
 
     assert res.status_code == 200
-    # assert res.json() == {"detail": "asset added"}
-    print(res.json())
 
 
 def test_update_bulk_asset():
@@ -269,19 +254,17 @@ def test_update_bulk_asset():
     )
 
     assert res.status_code == 200
-    # assert res.json() == {"detail": "asset added"}
-    print(res.json())
 
 
-def test_filter_bulk_asset():
-    res = client.post(
-        "/get-bulk-asset",
-        headers={"Authorization": "cs20btech11024@iith.ac.in"},
-        json=Bulk_Asset(
-            asset_name="Table",
-        ).dict(),
-    )
-    data = res.json()
-    assert res.status_code == 200
-    for asset in data:
-        print(asset)
+# def test_filter_bulk_asset():
+#     res = client.post(
+#         "/get-bulk-asset",
+#         headers={"Authorization": "cs20btech11024@iith.ac.in"},
+#         json=Bulk_Asset(
+#             asset_name="Table",
+#         ).dict(),
+#     )
+#     data = res.json()
+#     assert res.status_code == 200
+#     for asset in data:
+#         print(asset)

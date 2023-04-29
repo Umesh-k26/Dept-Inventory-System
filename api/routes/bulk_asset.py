@@ -26,14 +26,13 @@ def save_asset_pic(pic, FILE_NAME):
 async def get_asset_dict(req: Request):
     formData = await req.form()
     asset = dict()
+    pic = None
     for key in formData.keys():
         if formData.get(key) == "":
             asset[key] = None
             continue
         elif key == "picture":
             pic = await formData.get(key).read()
-            # if pic:
-            #     save_asset_pic(pic, FILE_NAME)
         else:
             asset[key] = formData.get(key)
     FILE_NAME = asset["serial_no"] + ".png"
@@ -59,14 +58,14 @@ async def add_bulk_asset(req: Request):
 
         with conn.cursor() as cur:
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
 
         if pic:
             save_asset_pic(pic, FILE_NAME)
+
         result_str = ""
-        for i in result[0]:
-            if i != "picture":
-                result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "Asset Added"
         body = (
@@ -74,7 +73,7 @@ async def add_bulk_asset(req: Request):
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
-        return {"detail": "Asset added Successfully"}
+        return {"detail": "Asset Added Successfully"}
 
     except Exception as e:
         print(e)
@@ -104,14 +103,16 @@ async def delete_bulk_asset(serial_no: str, asset_location: str):
         )
         with conn.cursor() as cur:
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
             cur.execute(q.get_sql())
         conn.commit()
 
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: Asset Does Not Exist"}
+
         result_str = ""
-        for i in result[0]:
-            if i != "picture":
-                result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "Asset Deleted"
         body = (
@@ -119,7 +120,7 @@ async def delete_bulk_asset(serial_no: str, asset_location: str):
             + result_str
         )
         threading.Thread(target=send_email_, args=[subject, body], daemon=False).start()
-        return {"detail": "Asset deleted Successfully"}
+        return {"detail": "Asset Deleted Successfully"}
 
     except Exception as e:
         print(e)
@@ -128,7 +129,7 @@ async def delete_bulk_asset(serial_no: str, asset_location: str):
 
 @router.put("/update-bulk-asset/")
 async def update_bulk_asset(req: Request):
-    asset = await get_asset_dict(req)
+    asset, pic, FILE_NAME = await get_asset_dict(req)
     try:
         asset_table = Table("bulk_asset")
         q = Query.update(asset_table).where(asset_table.serial_no == asset["serial_no"])
@@ -144,12 +145,18 @@ async def update_bulk_asset(req: Request):
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
         conn.commit()
 
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: Asset Does Not Exist"}
+
+        if pic:
+            save_asset_pic(pic, FILE_NAME)
+
         result_str = ""
-        for i in result[0]:
-            result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "Asset Updated"
         body = (

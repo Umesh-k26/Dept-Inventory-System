@@ -26,23 +26,22 @@ def save_asset_pic(pic, FILE_NAME):
 async def get_asset_dict(req: Request):
     formData = await req.form()
     asset = dict()
+    pic = None
     for key in formData.keys():
         if formData.get(key) == "":
             asset[key] = None
             continue
         elif key == "picture":
             pic = await formData.get(key).read()
-            FILE_NAME = asset["serial_no"] + ".png"
-            if pic:
-                save_asset_pic(pic, FILE_NAME)
         else:
             asset[key] = formData.get(key)
-    return asset
+    FILE_NAME = asset["serial_no"] + ".png"
+    return asset, pic, FILE_NAME
 
 
 @router.post("/add-asset")
 async def add_asset(req: Request):
-    asset = await get_asset_dict(req)
+    asset, pic, FILE_NAME = await get_asset_dict(req)
     try:
         asset_table = Table("asset")
         q = Query.into("asset").insert(
@@ -59,12 +58,14 @@ async def add_asset(req: Request):
 
         with conn.cursor() as cur:
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
+
+        if pic:
+            save_asset_pic(pic, FILE_NAME)
 
         result_str = ""
-        for i in result[0]:
-            if i != "picture":
-                result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "Asset Added"
         body = (
@@ -98,14 +99,16 @@ def delete_asset(serial_no: str):
         q = Query.from_(asset).delete().where(asset.serial_no.ilike(f"{serial_no}"))
         with conn.cursor() as cur:
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
             cur.execute(q.get_sql())
         conn.commit()
 
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: Asset Does Not Exist"}
+
         result_str = ""
-        for i in result[0]:
-            if i != "picture":
-                result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "Asset Deleted"
         body = (
@@ -122,7 +125,7 @@ def delete_asset(serial_no: str):
 
 @router.put("/update-asset/")
 async def update_asset(req: Request):
-    asset = await get_asset_dict(req)
+    asset, pic, FILE_NAME = await get_asset_dict(req)
     try:
         asset_table = Table("asset")
         q = Query.update(asset_table).where(asset_table.serial_no == asset["serial_no"])
@@ -138,12 +141,18 @@ async def update_asset(req: Request):
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
         conn.commit()
 
+        if pic:
+            save_asset_pic(pic, FILE_NAME)
+
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: Asset Does Not Exist"}
+
         result_str = ""
-        for i in result[0]:
-            result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "Asset Updated"
         body = (
