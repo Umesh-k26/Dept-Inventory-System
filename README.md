@@ -14,7 +14,7 @@ After downloading packages mentioned in ..._.txt run the following commands:<br 
 
 ## Features
 
-**Authentication** - To login to the website the user has to be a part of IITH community as well as has to be added into the database. For this purpose we use the Google-Auth.
+**Authentication** - To login to the website the user has to be a part of IITH community as well as has to be added into the database. For this purpose we use the Google-OAuth 2.0.
 
 **Different User Categories** - Here we provide two different categories of user namely Admin and User, wherein Admin has few more perks than the normal user.
 
@@ -30,4 +30,4 @@ After downloading packages mentioned in ..._.txt run the following commands:<br 
 
 **Notification Emails** - This functionality is to provide the admin with all the updates that happen in the database. Whenever anyone adds, updates or deletes any user, order, asset, or bulk asset from the database the admin recieves a mail stating the same with the changes.
 
-**Barcode Generator** - This functionaity 
+**Barcode Generator** - This functionaity is to provide the user with the barcode of the asset's serial number. The user can generate the barcodes of all the required assets by entering the details as required.

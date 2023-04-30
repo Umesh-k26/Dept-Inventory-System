@@ -61,11 +61,14 @@ def activate_deactivate_user(user_id: str, user_state: str):
         conn.commit()
         with conn.cursor() as cur:
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
+
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: User Does Not Exist"}
 
         result_str = ""
-        for i in result[0]:
-            result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "User State Change"
         body = (
@@ -92,12 +95,15 @@ def update_user(user: User):
         with conn.cursor() as cur:
             cur.execute(q.get_sql())
             cur.execute(q1.get_sql())
-            result = cur.fetchall()
+            result = cur.fetchone()
         conn.commit()
 
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: User Does Not Exist"}
+
         result_str = ""
-        for i in result[0]:
-            result_str += i + " : " + str(result[0][i]) + "<br>"
+        for i in result:
+            result_str += i + " : " + str(result[i]) + "<br>"
 
         subject = "User Updated"
         body = (

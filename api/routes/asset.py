@@ -96,13 +96,13 @@ def delete_asset(serial_no: str):
             )
             .where(asset.serial_no == serial_no)
         )
-        q = Query.from_(asset).delete().where(asset.serial_no.ilike(f"{serial_no}"))
+        q = Query.from_(asset).delete().where(asset.serial_no == serial_no)
         with conn.cursor() as cur:
             cur.execute(q1.get_sql())
             result = cur.fetchone()
             cur.execute(q.get_sql())
         conn.commit()
-
+        print(result)
         if result == None:
             return {"status_code": 404, "detail": "DETAIL: Asset Does Not Exist"}
 
@@ -143,6 +143,9 @@ async def update_asset(req: Request):
             cur.execute(q1.get_sql())
             result = cur.fetchone()
         conn.commit()
+
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: Asset Does Not Exist"}
 
         if pic:
             save_asset_pic(pic, FILE_NAME)

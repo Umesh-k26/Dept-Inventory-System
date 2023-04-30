@@ -167,6 +167,9 @@ async def update_order(req: Request):
             result = cur.fetchone()
         conn.commit()
 
+        if result == None:
+            return {"status_code": 404, "detail": "DETAIL: Order Does Not Exist"}
+
         if invoice:
             save_pdf(invoice, FILE_NAME, "invoice")
         if purchase_order:
