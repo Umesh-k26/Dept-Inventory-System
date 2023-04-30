@@ -34,7 +34,7 @@ export default NextAuth({
           },
         });
         const data = await res.json();
-        session.ok = res.status;
+        session.ok = res.ok;
         if (!res.ok) {
           session.message = data.detail;
         } else {

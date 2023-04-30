@@ -16,6 +16,7 @@ conf = ConnectionConfig(
     USE_CREDENTIALS=Config.MAIL_USE_CREDENTIALS,
     VALIDATE_CERTS=Config.MAIL_VALIDATE_CERTS,
 )
+override_conf = None
 
 
 class EmailSchema(BaseModel):
@@ -39,4 +40,9 @@ async def send_email(subject: str, body: str):
 
 def send_email_(subject: str, body: str):
     asyncio.run(send_email(subject, body))
+    return
+
+
+def override_send_email_(subject: str, body: str):
+    print("mail from overrride mail...")
     return

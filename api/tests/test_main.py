@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from main import app
 from utils.auth import get_user_details, override_get_user_details
+from models.email import send_email_, override_send_email_
 import pytest
 
 from models.db import User, Asset, Bulk_Asset, Order_Table
@@ -11,6 +12,7 @@ client = TestClient(app)
 
 if __name__ == "__main__":
     app.dependency_overrides[get_user_details] = override_get_user_details
+    app.dependency_overrides[send_email_] = override_send_email_
     pytest.main()
     app.dependency_overrides = {}
 

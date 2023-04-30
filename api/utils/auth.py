@@ -20,7 +20,6 @@ async def db_authorize(email):
             result = cur.fetchone()
     except Exception as e:
         raise e
-
     if result:
         if result["user_state"] != "Active":
             raise HTTPException(
