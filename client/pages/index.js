@@ -1,11 +1,24 @@
-import React from "react";
-import { signIn, getProviders, getSession } from "next-auth/react";
-import { redirect } from "next/dist/server/api-utils";
+import React, { useState, useEffect } from "react";
+import { signIn, getProviders, getSession, useSession } from "next-auth/react";
+import AdminNav from "components/Navbars/AdminNav";
+import UserNav from "components/Navbars/UserNav";
 
-const Home = ({ providers, message }) => {
+const Home = ({ providers, role }) => {
+  const { data: session, status } = useSession();
+
+  if (status === "authenticated") {
+    return (
+      <>
+        <p>You are signed in as {session.user.email}</p>
+        <p>Your role is {role}</p>
+        {role == "Admin" && <AdminNav />}
+        {role != "Admin" && <UserNav />}
+      </>
+    );
+  }
   return (
     <>
-      {message && <h2>{message}</h2>}
+      <h2>{session?.message}</h2>
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-8 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -43,25 +56,30 @@ export async function getServerSideProps(context) {
   const providers = await getProviders();
   const { req } = context;
   const session = await getSession({ req });
-  console.log(session);
-  if (session?.ok) {
-    if (session.isAdmin)
-      return {
-        redirect: {
-          destination: "/admin",
-        },
-      };
-    else
-      return {
-        redirect: {
-          destination: "/user",
-        },
-      };
+  let role = null;
+  if (session) {
+    role = await getRole(session.accessToken);
   }
+  // console.log("from index.js", session);
+
   return {
     props: {
       providers,
-      message: session?.message ? session.message : null,
+      role,
     },
   };
 }
+
+const getRole = async (token) => {
+  try {
+    const res = await fetch("http://localhost:8000/get-role/", {
+      headers: {
+        Authorization: token,
+      },
+    });
+    const data = await res.json();
+    return data.user_type;
+  } catch (err) {
+    console.log(err);
+  }
+};

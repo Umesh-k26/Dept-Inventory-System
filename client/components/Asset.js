@@ -214,6 +214,7 @@ export const DisplayAssets = () => {
       <a
         href={`http://localhost:8000/files/assets/${value}.png`}
         target="_blank"
+        className="text-red-500 hover:text-red-600 underline"
       >
         {" "}
         {value}{" "}

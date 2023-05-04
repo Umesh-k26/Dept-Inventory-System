@@ -1,7 +1,6 @@
-import React, { useContext, useRef } from "react";
+import React from "react";
 import { Form } from "components/Form";
 import DataTable from "components/Table";
-import { apiBaseUrl } from "next-auth/client/_utils";
 
 export const AddUser = () => {
   const fields = [
@@ -50,7 +49,8 @@ export const ActivateDeactivateUser = () => {
       ],
     },
   ];
-  const apiLink = "http://localhost:8000/activate-deactivate-user/${user_id}/${user_state}";
+  const apiLink =
+    "http://localhost:8000/activate-deactivate-user/${user_id}/${user_state}";
 
   return (
     <>

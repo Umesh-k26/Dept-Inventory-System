@@ -5,8 +5,11 @@ from utils.configs import Config
 from db.connect import conn
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from fastapi import HTTPException
+from cachetools import TTLCache
 
 # TODO: Does Google's verify_auth2_token() function retreive Google's certs every time the function is called? Is there any way to cache the response?
+
+cache = TTLCache(maxsize=1000, ttl=3600)
 
 
 async def db_authorize(email):
@@ -35,20 +38,31 @@ async def db_authorize(email):
 
 
 async def get_user_details(request: Request):
-    try:
-        print("doing auth...")
-        token = request.headers.get("Authorization")
-        idinfo = id_token.verify_oauth2_token(
-            token, requests.Request(), Config.GOOGLE_CLIENT_ID
-        )
-        email = idinfo["email"]
-        return await db_authorize(email)
-        # return True
+    print("called get_user_details")
+    token = request.headers.get("Authorization")
+    for v in cache.values():
+        print(v)
+    user_info = cache.get(token)
+    if user_info:
+        return user_info
+    else:
+        try:
+            print("doing auth...")
+            idinfo = id_token.verify_oauth2_token(
+                token, requests.Request(), Config.GOOGLE_CLIENT_ID
+            )
 
-    except HTTPException as e:
-        raise e
-    except ValueError:
-        raise HTTPException(404, detail="We are not able to authenticate you.")
+            email = idinfo["email"]
+            user_info = await db_authorize(email)
+            cache[token] = user_info
+            return user_info
+
+        except HTTPException as e:
+            print(e)
+            raise e
+        except ValueError:
+            print(e)
+            raise HTTPException(404, detail="We are not able to authenticate you.")
 
 
 async def override_get_user_details(request: Request):

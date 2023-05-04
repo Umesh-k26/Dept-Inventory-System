@@ -27,22 +27,6 @@ export default NextAuth({
     async session({ session, token }) {
       session.user.id = token.id;
       session.accessToken = token.accessToken;
-      try {
-        const res = await fetch("http://localhost:8000/get-role", {
-          headers: {
-            Authorization: session.accessToken,
-          },
-        });
-        const data = await res.json();
-        session.ok = res.ok;
-        if (!res.ok) {
-          session.message = data.detail;
-        } else {
-          session.isAdmin = data.user_type == "Admin";
-        }
-      } catch (err) {
-        console.log(err);
-      }
       return session;
     },
   },

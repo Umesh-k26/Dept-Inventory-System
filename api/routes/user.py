@@ -15,6 +15,7 @@ origins = [
 
 @router.post("/add-user")
 def add_user(user: User):
+    # access return value of get_user_details
     try:
         users = Table("users")
         q = Query.into(users).insert(*user.dict().values())

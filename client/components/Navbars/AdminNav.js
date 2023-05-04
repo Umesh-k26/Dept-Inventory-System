@@ -1,120 +1,135 @@
 import React from "react";
-import DropDown from "components/Dropdown";
+import {
+  AddUser,
+  ActivateDeactivateUser,
+  UpdateUser,
+  DisplayUsers,
+} from "components/User";
+import {
+  AddAsset,
+  DeleteAsset,
+  UpdateAsset,
+  DisplayAssets,
+  AssetsBarcode,
+} from "components/Asset";
+import {
+  AddBulkAsset,
+  DeleteBulkAsset,
+  UpdateBulkAsset,
+  DisplayBulkAssets,
+  BulkAssetsBarcode,
+} from "components/BulkAsset";
+import {
+  AddOrder,
+  DeleteOrder,
+  UpdateOrder,
+  DisplayOrders,
+} from "components/Order";
+import DisplayNav from "./DisplayNav";
 
-const AdminNav = ({ handleOptionClick, selectedOption }) => {
+const AdminNav = () => {
   const options = {
     user: [
       {
         id: 1,
         name: "Add User",
+        prop: AddUser,
       },
       {
         id: 2,
         name: "Update User",
+        prop: UpdateUser,
       },
       {
         id: 3,
         name: "Activate/ Deactivate User",
+        prop: ActivateDeactivateUser,
       },
       {
         id: 4,
         name: "Display Users",
+        prop: DisplayUsers,
       },
     ],
     asset: [
       {
         id: 11,
         name: "Add Asset",
+        prop: AddAsset,
       },
       {
         id: 22,
         name: "Update Asset",
+        prop: UpdateAsset,
       },
       {
         id: 33,
         name: "Delete Asset",
+        prop: DeleteAsset,
       },
       {
         id: 44,
         name: "Display Assets",
+        prop: DisplayAssets,
       },
       {
         id: 55,
-        name: "Assets Barcode"
-      }
+        name: "Assets Barcode",
+        prop: AssetsBarcode,
+      },
     ],
     bulkAsset: [
       {
         id: 111,
         name: "Add Bulk Asset",
+        prop: AddBulkAsset,
       },
       {
         id: 222,
         name: "Update Bulk Asset",
+        prop: UpdateBulkAsset,
       },
       {
         id: 333,
         name: "Delete Bulk Asset",
+        prop: DeleteBulkAsset,
       },
       {
         id: 444,
         name: "Display Bulk Assets",
+        prop: DisplayBulkAssets,
       },
       {
         id: 555,
-        name: "Bulk Assets Barcode"
+        name: "Bulk Assets Barcode",
+        prop: BulkAssetsBarcode,
       },
     ],
     order: [
       {
         id: 1111,
         name: "Add Order",
+        prop: AddOrder,
       },
       {
         id: 2222,
         name: "Update Order",
+        prop: UpdateOrder,
       },
       {
         id: 3333,
         name: "Delete Order",
+        prop: DeleteOrder,
       },
       {
         id: 4444,
         name: "Display Orders",
+        prop: DisplayOrders,
       },
     ],
   };
 
-  return (
-    <>
-      <div className="flex justify-start">
-        <DropDown
-          handleOptionClick={handleOptionClick}
-          selectedOption={selectedOption}
-          options={options.user}
-          displayName={"User"}
-        />
-        <DropDown
-          handleOptionClick={handleOptionClick}
-          selectedOption={selectedOption}
-          options={options.asset}
-          displayName={"Asset"}
-        />
-        <DropDown
-          handleOptionClick={handleOptionClick}
-          selectedOption={selectedOption}
-          options={options.bulkAsset}
-          displayName={"Bulk Asset"}
-        />
-        <DropDown
-          handleOptionClick={handleOptionClick}
-          selectedOption={selectedOption}
-          options={options.order}
-          displayName={"Order"}
-        />
-      </div>
-    </>
-  );
+  return <DisplayNav types={options} />;
 };
 
 export default AdminNav;

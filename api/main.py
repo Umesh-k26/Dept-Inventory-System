@@ -14,7 +14,7 @@ from utils.warranty import warranty_
 from db.connect import conn
 import uvicorn
 
-app = FastAPI(dependencies=[Depends(get_user_details)])
+app = FastAPI()
 # app = FastAPI()
 origins = [
     "http://localhost:3000",
