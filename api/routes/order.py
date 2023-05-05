@@ -1,12 +1,14 @@
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, Depends
 from fastapi import APIRouter
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from pypika import functions as fn
 import os
+from typing import Annotated
 from db.connect import conn
 from models.db import Order_Table
 from models.responses import OrderDetails
 from models.email import send_email_
+from utils.auth import get_user_details
 import threading
 
 router = APIRouter()
@@ -274,9 +276,12 @@ async def get_order(order_: Order_Table):
 
 
 @router.get("/get-all-order")
-async def get_all_order():
+async def get_all_order(details: Annotated[dict, Depends(get_user_details)]):
     order = Table("order_table")
     q = Query.from_(order).select(order.star)
+
+    if details["user_type"] == "Student":
+        q = q.where(order.indentor == details["user_id"])
     with conn.cursor() as cur:
         cur.execute(q.get_sql())
         results = cur.fetchall()

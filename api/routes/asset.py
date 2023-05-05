@@ -1,11 +1,13 @@
-from fastapi import HTTPException, Request
+from fastapi import HTTPException, Request, Depends
 from pypika import PostgreSQLQuery as Query, Table, Criterion
 from db.connect import conn
 from fastapi import APIRouter
 import threading
+from typing import Annotated
 import os
 from models.db import Asset
 from models.email import send_email_
+from utils.auth import get_user_details
 
 router = APIRouter()
 
@@ -215,9 +217,12 @@ def filter_asset(asset_: Asset):
 
 
 @router.get("/get-all-asset")
-def get_all_asset():
+def get_all_asset(details: Annotated[dict, Depends(get_user_details)]):
     asset = Table("asset")
     q = Query.from_(asset).select(asset.star)
+
+    if details["user_type"] == "Student":
+        q = q.where(asset.asset_holder == details["user_id"])
     with conn.cursor() as cur:
         cur.execute(q.get_sql())
         results = cur.fetchall()

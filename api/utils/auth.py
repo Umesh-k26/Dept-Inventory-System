@@ -34,6 +34,7 @@ async def db_authorize(email):
         )
     details["email"] = email
     details["user_type"] = result["user_type"]
+    details["user_id"] = result["user_id"]
     return details
 
 
@@ -60,7 +61,7 @@ async def get_user_details(request: Request):
         except HTTPException as e:
             print(e)
             raise e
-        except ValueError:
+        except ValueError as e:
             print(e)
             raise HTTPException(404, detail="We are not able to authenticate you.")
 

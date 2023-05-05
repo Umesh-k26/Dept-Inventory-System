@@ -29,7 +29,7 @@ import DisplayNav from "./DisplayNav";
 
 const AdminNav = () => {
   const options = {
-    user: [
+    User: [
       {
         id: 1,
         name: "Add User",
@@ -51,7 +51,7 @@ const AdminNav = () => {
         prop: DisplayUsers,
       },
     ],
-    asset: [
+    Asset: [
       {
         id: 11,
         name: "Add Asset",
@@ -78,7 +78,7 @@ const AdminNav = () => {
         prop: AssetsBarcode,
       },
     ],
-    bulkAsset: [
+    "Bulk Asset": [
       {
         id: 111,
         name: "Add Bulk Asset",
@@ -105,7 +105,7 @@ const AdminNav = () => {
         prop: BulkAssetsBarcode,
       },
     ],
-    order: [
+    Order: [
       {
         id: 1111,
         name: "Add Order",

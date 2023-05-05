@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import MUIDataTable from "mui-datatables";
+// import Button
+import { Button, CustomToolbar, CustomToolbarSelect } from "@material-ui/core";
 
 const options = {
-  filterType: "dropdown",
+  filterType: "textField",
   download: true,
   print: true,
   selectableRows: "multiple",
@@ -15,6 +17,19 @@ const options = {
       useDisplayedColumnsOnly: true,
       useDisplayedRowsOnly: true,
     },
+  },
+  customFilterDialogFooter: (currentFilterList, applyNewFilters) => {
+    return (
+      <div style={{ marginTop: "40px" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => applyNewFilters()}
+        >
+          Apply Filters
+        </Button>
+      </div>
+    );
   },
 };
 

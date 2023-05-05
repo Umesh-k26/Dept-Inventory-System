@@ -1,6 +1,5 @@
 import NextAuth from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
-import { redirect } from "next/dist/server/api-utils";
 
 export default NextAuth({
   providers: [
